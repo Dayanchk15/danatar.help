@@ -1,74 +1,228 @@
 ---
-import { categories, services } from "../data/services";
-import { tr } from "../i18n/ssr";
+interface Category {
+  id: string;
+  label: string;
+}
+
+interface ServiceItem {
+  id: string;
+  title: string;
+  text: string;
+  categories: string[];
+}
+
+interface Props {
+  id?: string;
+  title: string;
+  subtitle?: string;
+  categories: Category[];
+  items: ServiceItem[];
+}
+
+const { id = "services", title, subtitle, categories, items } = Astro.props;
 ---
 
-<section id="services" class="py-10 sm:py-14">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-    <div class="max-w-2xl">
-      <h2 class="text-2xl font-semibold tracking-tight" data-i18n="services.title">Services</h2>
-      <p class="mt-2 text-muted" data-i18n="services.subtitle">Pick a category to explore what we do.</p>
+<sy-services id={id}>
+  <div class="u-container container">
+    <div class="panel">
+      <h2 class="u-heading title" data-sy-reveal="words">{title}</h2>
+      {subtitle ? (
+        <p class="u-text subtitle" data-sy-reveal="lines">{subtitle}</p>
+      ) : null}
+
+      <div class="filters" role="tablist" aria-label={title}>
+        {categories.map((c, idx) => (
+          <button
+            type="button"
+            class:list={["filter", idx === 0 && "is-active"]}
+            data-filter={c.id}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+
+      <div class="grid">
+        {items.map((it) => (
+          <article
+            class="card"
+            data-categories={it.categories.join(",")}
+            data-sy-reveal="lines"
+          >
+            <h3 class="u-text card-title">{it.title}</h3>
+            <p class="u-text card-text">{it.text}</p>
+          </article>
+        ))}
+      </div>
     </div>
 
-    <div class="mt-7 flex flex-wrap gap-2" id="service-filters">
-      {categories.map((c) => (
-        <button class="pill text-sm" type="button" data-service-category={c.id} data-i18n={c.i18nKey}>
-          {tr(c.i18nKey)}
-        </button>
-      ))}
-    </div>
-
-    <div class="mt-6 grid gap-4 md:grid-cols-2" id="service-grid">
-      {services.map((s) => (
-        <article
-          class="card rounded-2xl p-6"
-          data-service-item
-          data-service-tags={s.categoryIds.join(",")}
-        >
-          <h3 class="text-lg font-semibold" data-i18n={s.titleKey}>{tr(s.titleKey)}</h3>
-          <p class="mt-2 text-sm text-muted" data-i18n={s.descKey}>{tr(s.descKey)}</p>
-        </article>
-      ))}
-    </div>
+    <!-- Anchor point for the floating GL sphere so it stays visible in this section -->
+    <div class="gl-place" data-gl-place data-gl-place-factor="1.1"></div>
   </div>
+</sy-services>
 
-  <script type="module">
-    import { applyTranslations } from "../i18n";
+<style>
+  sy-services {
+    display: block;
+    padding: 4rem 0;
+    position: relative;
+    z-index: 2;
+  }
 
-    const root = document.getElementById("services");
-    if (!root) throw new Error("services root not found");
+  .container {
+    position: relative;
+  }
 
-    const filterBar = root.querySelector("#service-filters");
-    const items = Array.from(root.querySelectorAll("[data-service-item]"));
-    const filterButtons = Array.from(root.querySelectorAll("[data-service-category]"));
+  .panel {
+    max-width: 70rem;
+    margin: 0 auto;
+    border-radius: 1.5rem;
+    padding: 2.25rem 1.75rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.05);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
 
-    const getTags = (el) => (el.getAttribute("data-service-tags") ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+    @media (--mq-phone) {
+      padding: 1.75rem 1.25rem;
+    }
+  }
 
-    let active = "all";
+  .title {
+    --fs: 3rem;
+    text-align: center;
+    margin: 0;
+  }
 
-    const applyFilter = () => {
-      filterButtons.forEach((btn) => {
-        const isActive = btn.getAttribute("data-service-category") === active;
-        btn.classList.toggle("ring-2", isActive);
-        btn.classList.toggle("ring-indigo-500/60", isActive);
-      });
+  .subtitle {
+    --fs: var(--font-size-md);
+    text-align: center;
+    max-width: 44em;
+    margin: 1rem auto 0;
+    color: var(--color-text-alt);
+  }
 
-      items.forEach((card) => {
-        const tags = getTags(card);
-        const visible = active === "all" ? true : tags.includes(active);
-        card.toggleAttribute("hidden", !visible);
-      });
-    };
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: center;
+    margin: 2rem auto 0;
+    max-width: 60rem;
+  }
 
-    filterBar?.addEventListener("click", (e) => {
-      const target = e.target instanceof HTMLElement ? e.target.closest("[data-service-category]") : null;
-      const next = target?.getAttribute("data-service-category");
+  .filter {
+    @extend %u-text;
+    --fs: var(--font-size-sm);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: var(--glass-pill-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.05);
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s var(--ease-out-expo),
+      border-color 0.2s var(--ease-out-expo);
+  }
+
+  .filter:hover,
+  .filter:focus {
+    border-color: rgba(0, 0, 0, 0.25);
+  }
+
+  .filter.is-active {
+    border-color: transparent;
+    color: var(--color-brand-1);
+    background: rgba(var(--rgb-brand-3), 0.85);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+
+    @media (--mq-tablet) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (--mq-phone) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .card {
+    border-radius: 1rem;
+    padding: 1.25rem 1.25rem 1.35rem;
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.05);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.05);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+  }
+
+  .card-title {
+    --fs: var(--font-size-md);
+    --fw: 600;
+    margin: 0;
+  }
+
+  .card-text {
+    --fs: var(--font-size-sm);
+    color: var(--color-text-alt);
+    margin: 0.6rem 0 0;
+    max-width: 42em;
+  }
+
+  .gl-place {
+    --d: 1;
+    --s: 18rem;
+    position: absolute;
+    right: 8%;
+    top: -2rem;
+    pointer-events: none;
+
+    @media (--mq-tablet) {
+      right: 0;
+      left: 0;
+      margin: 0 auto;
+      top: -4rem;
+      transform: translateX(10%);
+    }
+  }
+</style>
+
+<script>
+  class Services extends HTMLElement {
+    filters = Array.from(this.querySelectorAll<HTMLButtonElement>(".filter"));
+    cards = Array.from(this.querySelectorAll<HTMLElement>(".card"));
+    active = this.filters[0]?.dataset.filter || "all";
+
+    connectedCallback() {
+      this.filters.forEach((b) =>
+        b.addEventListener("click", () => this.setFilter(b.dataset.filter))
+      );
+      this.apply();
+    }
+
+    setFilter(next?: string) {
       if (!next) return;
-      active = next;
-      applyFilter();
-    });
+      this.active = next;
+      this.filters.forEach((b) =>
+        b.classList.toggle("is-active", b.dataset.filter === this.active)
+      );
+      this.apply();
+    }
 
-    applyFilter();
-  </script>
-</section>
+    apply() {
+      const active = this.active;
+      this.cards.forEach((card) => {
+        const cats = (card.dataset.categories || "").split(",").filter(Boolean);
+        const visible = active === "all" ? true : cats.includes(active);
+        card.style.display = visible ? "" : "none";
+      });
+    }
+  }
+
+  customElements.define("sy-services", Services);
+</script>
 

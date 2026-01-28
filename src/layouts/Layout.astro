@@ -1,61 +1,76 @@
 ---
+import { Font } from "astro:assets";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import SmoothScroll from "../components/SmoothScroll.astro";
+import { buildLangPath, getLangFromUrl, useTranslations } from "../i18n/utils";
+import { languages } from "../i18n/ui";
 import "../styles/global.css";
 
-type Props = {
-  title?: string;
-  description?: string;
-};
+const { title } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
-const {
-  title = "Danatar — IT Services",
-  description = "Web design, SEO, online marketing, business automation, product & print design, mobile apps, code help, consulting, and logos.",
-} = Astro.props;
+const links = [
+  { title: t("nav.home"), url: `/${lang}/` },
+  { title: t("nav.about"), url: "#about" },
+  { title: t("nav.contact"), url: "#contact" },
+];
+
+const langLinks = Object.entries(languages).map(([code, label]) => ({
+  code,
+  label,
+  url: buildLangPath(Astro.url, code as keyof typeof languages),
+}));
 ---
 
-<!doctype html>
-<html lang="ru" class="scroll-smooth">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="generator" content={Astro.generator} />
-    <meta name="description" content={description} />
+    <Font cssVariable="--font-roboto-slab" preload />
+    <Font cssVariable="--font-inter" preload />
     <title>{title}</title>
   </head>
-  <body class="min-h-dvh bg-app text-slate-900 antialiased">
-    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10">
-      <div class="absolute inset-0 bg-grid opacity-[0.35]"></div>
-      <div class="absolute -top-24 left-1/2 h-[520px] w-[920px] -translate-x-1/2 rounded-full bg-glow blur-3xl"></div>
-    </div>
-
-    <slot />
-
-    <script type="module">
-      import { initI18n, setLanguage, getCurrentLanguage } from "../i18n";
-
-      const syncLanguageUi = () => {
-        const current = getCurrentLanguage();
-        document.querySelectorAll("[data-lang]").forEach((el) => {
-          const btn = el;
-          const isActive = btn.getAttribute("data-lang") === current;
-          btn.toggleAttribute("data-active", isActive);
-          btn.classList.toggle("ring-2", isActive);
-          btn.classList.toggle("ring-indigo-500/60", isActive);
-        });
-      };
-
-      await initI18n();
-      syncLanguageUi();
-
-      document.addEventListener("click", async (e) => {
-        const target = e.target instanceof HTMLElement ? e.target.closest("[data-lang]") : null;
-        const lang = target?.getAttribute("data-lang");
-        if (!lang) return;
-        await setLanguage(lang);
-        syncLanguageUi();
-      });
-    </script>
+  <body>
+    <a href="#main" class="skip-link">{t("accessibility.skip-to-content")}</a>
+    <Header
+      logoUrl={`/${lang}/`}
+      logoAlt="Danny"
+      links={links}
+      currentLang={lang}
+      langLinks={langLinks}
+      langLabel={t("nav.language")}
+    />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer logoUrl={`/${lang}/`} logoAlt="Danny" links={links} />
+    <SmoothScroll />
   </body>
 </html>
 
+<style>
+  .skip-link {
+    background: var(--color-brand-1);
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: min-content;
+    white-space: nowrap;
+    padding: 0.5rem;
+    position: absolute;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    transform: translateY(0%);
+  }
+</style>
+
+<script>
+  import "../utils/reveals";
+  import "../utils/i18nClient";
+</script>

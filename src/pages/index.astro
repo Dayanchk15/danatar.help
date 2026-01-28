@@ -1,22 +1,19 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Hero from "../components/Hero.astro";
-import Features from "../components/Features.astro";
-import HowItWorks from "../components/HowItWorks.astro";
-import Services from "../components/Services.astro";
-import Pricing from "../components/Pricing.astro";
-import FAQ from "../components/FAQ.astro";
-import Footer from "../components/Footer.astro";
+import { defaultLang } from "../i18n/ui";
 ---
 
-<Layout title="Danatar — IT Services">
-  <Header />
-  <Hero />
-  <Features />
-  <HowItWorks />
-  <Services />
-  <Pricing />
-  <FAQ />
-  <Footer />
-</Layout>
+<!doctype html>
+<html lang={defaultLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0;url=/${defaultLang}/`} />
+    <title>Danny</title>
+  </head>
+  <body>
+    <p>
+      Redirecting to <a href={`/${defaultLang}/`}>/{defaultLang}/</a>...
+    </p>
+  </body>
+</html>
+---
+

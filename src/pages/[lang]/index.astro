@@ -1,0 +1,287 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import HeroHome from "../../components/HeroHome.astro";
+import TextMarquee from "../../components/TextMarquee.astro";
+import GalleryText from "../../components/GalleryText.astro";
+import Faqs from "../../components/Faqs.astro";
+import StepsTimeline from "../../components/StepsTimeline.astro";
+import Statements from "../../components/Statements.astro";
+import Introducing from "../../components/Introducing.astro";
+import GL from "../../components/GL.astro";
+import GLPlaces from "../../components/GlPlaces.astro";
+import Services from "../../components/Services.astro";
+
+import { languages } from "../../i18n/ui";
+import { useTranslations } from "../../i18n/utils";
+
+export async function getStaticPaths() {
+  return Object.keys(languages).map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang: langParam } = Astro.params;
+const lang = langParam as keyof typeof languages;
+const t = useTranslations(lang);
+---
+
+<Layout title={t("meta.title.home")}>
+  <HeroHome
+    title={t("hero.title")}
+    subtitle={t("hero.subtitle")}
+    cta={{
+      title: t("hero.cta"),
+      url: `/${lang}/#contact`,
+    }}
+  />
+
+  <section id="intro">
+    <Introducing
+      title={t("intro.title")}
+      text={t("intro.text")}
+      cta={{
+        title: t("intro.cta"),
+        url: `/${lang}/#services`,
+      }}
+    />
+  </section>
+
+  <Services
+    id="services"
+    title={t("services.title")}
+    subtitle={t("services.subtitle")}
+    categories={[
+      { id: "all", label: t("services.categories.all") },
+      { id: "web", label: t("services.categories.web") },
+      { id: "marketing", label: t("services.categories.marketing") },
+      { id: "automation", label: t("services.categories.automation") },
+      { id: "design", label: t("services.categories.design") },
+      { id: "development", label: t("services.categories.development") },
+      { id: "consulting", label: t("services.categories.consulting") },
+    ]}
+    items={[
+      {
+        id: "webDesign",
+        title: t("services.items.webDesign.title"),
+        text: t("services.items.webDesign.text"),
+        categories: ["web", "design"],
+      },
+      {
+        id: "seo",
+        title: t("services.items.seo.title"),
+        text: t("services.items.seo.text"),
+        categories: ["marketing"],
+      },
+      {
+        id: "onlineMarketing",
+        title: t("services.items.onlineMarketing.title"),
+        text: t("services.items.onlineMarketing.text"),
+        categories: ["marketing"],
+      },
+      {
+        id: "businessAutomation",
+        title: t("services.items.businessAutomation.title"),
+        text: t("services.items.businessAutomation.text"),
+        categories: ["automation", "development"],
+      },
+      {
+        id: "productDesign",
+        title: t("services.items.productDesign.title"),
+        text: t("services.items.productDesign.text"),
+        categories: ["design"],
+      },
+      {
+        id: "printDesign",
+        title: t("services.items.printDesign.title"),
+        text: t("services.items.printDesign.text"),
+        categories: ["design"],
+      },
+      {
+        id: "appDevelopment",
+        title: t("services.items.appDevelopment.title"),
+        text: t("services.items.appDevelopment.text"),
+        categories: ["development"],
+      },
+      {
+        id: "codeHelp",
+        title: t("services.items.codeHelp.title"),
+        text: t("services.items.codeHelp.text"),
+        categories: ["development", "consulting"],
+      },
+      {
+        id: "consulting",
+        title: t("services.items.consulting.title"),
+        text: t("services.items.consulting.text"),
+        categories: ["consulting"],
+      },
+      {
+        id: "logos",
+        title: t("services.items.logos.title"),
+        text: t("services.items.logos.text"),
+        categories: ["design"],
+      },
+    ]}
+  />
+
+  <StepsTimeline
+    title={t("steps.title")}
+    items={[
+      { title: t("steps.1.title"), text: t("steps.1.text") },
+      { title: t("steps.2.title"), text: t("steps.2.text") },
+      { title: t("steps.3.title"), text: t("steps.3.text") },
+    ]}
+  />
+
+  <section data-gl-no-down-start="true">
+    <GalleryText
+      title={t("gallery.title")}
+      text={t("gallery.text")}
+      cta={{
+        title: t("gallery.cta"),
+        url: `/${lang}/#contact`,
+      }}
+      images={[
+        { alt: "Dashboard overview", src: "/image-1.jpg", width: 6000, height: 4000 },
+        { alt: "Project collaboration view", src: "/image-2.jpg", width: 2689, height: 4032 },
+        { alt: "Analytics and reporting", src: "/image-3.jpg", width: 3734, height: 5359 },
+      ]}
+      marqueeTexts={[t("marquee.1"), t("marquee.2"), t("marquee.3"), t("marquee.4")]}
+    />
+  </section>
+
+  <Statements
+    items={[
+      { title: t("statements.1.title"), text: t("statements.1.text") },
+      { title: t("statements.2.title"), text: t("statements.2.text") },
+      { title: t("statements.3.title"), text: t("statements.3.text") },
+    ]}
+  />
+
+  <section id="about" class="about u-container">
+    <div class="about-inner">
+      <h2 class="u-heading about-title" data-sy-reveal="words">
+        {t("aboutBlock.title")}
+      </h2>
+      <p class="u-text about-text" data-sy-reveal="lines">
+        {t("aboutBlock.text")}
+      </p>
+    </div>
+  </section>
+
+  <Faqs
+    title={t("faqs.title")}
+    mobileTitle={t("faqs.mobileTitle")}
+    subtitle={t("faqs.subtitle")}
+    items={[
+      { question: t("faqs.q1"), answer: t("faqs.a1") },
+      { question: t("faqs.q2"), answer: t("faqs.a2") },
+      { question: t("faqs.q3"), answer: t("faqs.a3") },
+      { question: t("faqs.q4"), answer: t("faqs.a4") },
+      { question: t("faqs.q5"), answer: t("faqs.a5") },
+    ]}
+  />
+
+  <section id="contact" class="contact u-container">
+    <div class="contact-inner">
+      <h2 class="u-heading contact-title" data-sy-reveal="words">{t("contact.title")}</h2>
+      <p class="u-text contact-text" data-sy-reveal="lines">{t("contact.text")}</p>
+      <a class="contact-cta" href="mailto:hello@example.com">{t("contact.cta")}</a>
+    </div>
+  </section>
+
+  <TextMarquee
+    class="marquee"
+    texts={[
+      t("services.items.webDesign.title"),
+      t("services.items.seo.title"),
+      t("services.items.onlineMarketing.title"),
+      t("services.items.businessAutomation.title"),
+      t("services.items.productDesign.title"),
+      t("services.items.printDesign.title"),
+      t("services.items.appDevelopment.title"),
+      t("services.items.codeHelp.title"),
+      t("services.items.consulting.title"),
+      t("services.items.logos.title"),
+    ]}
+  />
+
+  <GL />
+  <GLPlaces />
+</Layout>
+
+<style>
+  .marquee {
+    padding: 2rem 0;
+    z-index: 9;
+  }
+
+  .about {
+    padding: 2rem 0 0;
+  }
+
+  .about-inner {
+    max-width: 56rem;
+    margin: 0 auto;
+    text-align: center;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.05);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .about-title {
+    --fs: 3rem;
+    --lh: 1.1;
+    margin: 0;
+  }
+
+  .about-text {
+    margin: 1rem auto 0;
+    color: var(--color-text-alt);
+    max-width: 44em;
+  }
+
+  .contact {
+    padding: 6rem 0 8rem;
+  }
+
+  .contact-inner {
+    max-width: 50rem;
+    margin: 0 auto;
+    text-align: center;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.05);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .contact-title {
+    --fs: 3rem;
+    --lh: 1.1;
+    margin: 0;
+  }
+
+  .contact-text {
+    margin: 1rem auto 0;
+    color: var(--color-text-alt);
+    max-width: 44em;
+  }
+
+  .contact-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1.5rem;
+    padding: 0.85rem 1.1rem;
+    border-radius: 999px;
+    text-decoration: none;
+    background: var(--color-brand-3);
+    color: var(--color-brand-1);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+</style>
+

@@ -1,33 +1,159 @@
 ---
-import { tr } from "../i18n/ssr";
+import type { Link } from "../types";
+
+interface Props {
+  logoUrl: string;
+  logoAlt: string;
+  links: Link[];
+}
+
+const { logoUrl, logoAlt, links } = Astro.props;
 ---
 
-<footer id="contact" class="py-12">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-    <div class="card rounded-3xl p-8 sm:p-10">
-      <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-        <div class="max-w-xl">
-          <h2 class="text-2xl font-semibold tracking-tight" data-i18n="contact.title">{tr("contact.title")}</h2>
-          <p class="mt-2 text-muted" data-i18n="contact.subtitle">
-            {tr("contact.subtitle")}
-          </p>
-        </div>
-        <div class="flex flex-wrap gap-3">
-          <a class="btn btn-primary" href="mailto:hello@danatar.dev">hello@danatar.dev</a>
-          <a class="btn" href="#services" data-i18n="contact.backToServices">{tr("contact.backToServices")}</a>
-        </div>
-      </div>
+<sy-footer>
+  <footer>
+    <div class="inner u-container">
+      <div class="wrapper">
+        <a class="logo" href={logoUrl}>
+          <span class="logo-text" aria-hidden="true">{logoAlt}</span>
+          <span class="u-sr-only">{logoAlt}</span>
+        </a>
 
-      <div class="mt-8 flex flex-col gap-2 border-t border-slate-900/10 pt-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-        <p>© <span id="year"></span> Danatar</p>
-        <p data-i18n="footer.note">{tr("footer.note")}</p>
+        <div class="menu">
+          <ul>
+            {
+              links.map((l) => (
+                <li>
+                  <a href={l.url}>{l.title}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <p class="cp">© {new Date().getFullYear()} {logoAlt}</p>
       </div>
     </div>
-  </div>
+  </footer>
+</sy-footer>
 
-  <script>
-    const el = document.getElementById("year");
-    if (el) el.textContent = String(new Date().getFullYear());
-  </script>
-</footer>
+<style>
+  sy-footer {
+    @extend %u-text;
 
+    --fs: var(--font-size-sm);
+    display: block;
+    clip-path: inset(0);
+
+    :global(&.has-no-anim footer) {
+      position: static;
+    }
+  }
+
+  footer {
+    background: rgba(0, 0, 0, 0.35);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.08);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.86);
+    position: fixed;
+    z-index: 30;
+    bottom: 0;
+    width: 100%;
+  }
+
+  .inner {
+    padding: 2rem 0;
+  }
+
+  .logo {
+    position: relative;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .logo-text {
+    font-weight: 650;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  .menu {
+    ul {
+      display: flex;
+      padding: 0;
+      gap: 1rem;
+      margin: 0;
+      list-style: none;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+
+      a {
+        text-decoration: none;
+        position: relative;
+
+        &::after {
+          content: "";
+          position: absolute;
+          height: 2px;
+          background: currentcolor;
+          top: 115%;
+          width: 100%;
+          left: 0;
+          pointer-events: none;
+          transform: scaleX(0);
+          transition: transform 0.3s var(--ease-out-expo);
+          transform-origin: right;
+        }
+
+        &:hover,
+        &:focus {
+          &::after {
+            transform: scaleX(1);
+            transform-origin: left;
+          }
+        }
+      }
+    }
+  }
+
+  .wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+
+    @media (--mq-tablet) {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  import { addResizeObserver } from "../utils/observers";
+
+  class Footer extends HTMLElement {
+    connectedCallback() {
+      addResizeObserver(this);
+
+      this.onResize();
+    }
+
+    onResize() {
+      const inner = this.firstElementChild as HTMLElement;
+      const bcr = inner.getBoundingClientRect();
+
+      if (bcr.height + 100 > window.innerHeight) {
+        this.style.height = "";
+        this.classList.add("has-no-anim");
+      } else {
+        this.style.height = `${bcr.height}px`;
+        this.classList.remove("has-no-anim");
+      }
+    }
+  }
+
+  customElements.define("sy-footer", Footer);
+</script>
