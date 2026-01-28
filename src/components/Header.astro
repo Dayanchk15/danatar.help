@@ -1,0 +1,60 @@
+---
+import LanguageSwitcher from "./LanguageSwitcher.astro";
+import { tr } from "../i18n/ssr";
+---
+
+<header class="sticky top-0 z-20 border-b border-slate-900/10 bg-white/60 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-3">
+      <a href="/" class="text-base font-semibold tracking-tight">Danatar</a>
+      <span class="hidden text-sm text-muted sm:inline" data-i18n="header.tagline">IT services for modern teams</span>
+    </div>
+
+    <nav class="hidden items-center gap-6 md:flex" aria-label="Primary">
+      <a class="text-sm font-medium text-slate-900/80 hover:text-slate-900" href="#services" data-i18n="nav.services">{tr("nav.services")}</a>
+      <a class="text-sm font-medium text-slate-900/80 hover:text-slate-900" href="#how" data-i18n="nav.how">{tr("nav.how")}</a>
+      <a class="text-sm font-medium text-slate-900/80 hover:text-slate-900" href="#pricing" data-i18n="nav.pricing">{tr("nav.pricing")}</a>
+      <a class="text-sm font-medium text-slate-900/80 hover:text-slate-900" href="#faq" data-i18n="nav.faq">{tr("nav.faq")}</a>
+      <a class="btn btn-primary text-sm" href="#contact" data-i18n="nav.contact">{tr("nav.contact")}</a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      <button
+        class="pill text-sm md:hidden"
+        type="button"
+        aria-controls="mobile-menu"
+        aria-expanded="false"
+        data-menu-btn
+        data-i18n="nav.menu"
+      >
+        {tr("nav.menu")}
+      </button>
+      <LanguageSwitcher />
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="hidden border-t border-slate-900/10 bg-white/80 backdrop-blur md:hidden">
+    <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-4 sm:px-6 lg:px-8">
+      <a class="pill w-fit text-sm" href="#services" data-i18n="nav.services">{tr("nav.services")}</a>
+      <a class="pill w-fit text-sm" href="#how" data-i18n="nav.how">{tr("nav.how")}</a>
+      <a class="pill w-fit text-sm" href="#pricing" data-i18n="nav.pricing">{tr("nav.pricing")}</a>
+      <a class="pill w-fit text-sm" href="#faq" data-i18n="nav.faq">{tr("nav.faq")}</a>
+      <a class="pill w-fit text-sm" href="#contact" data-i18n="nav.contact">{tr("nav.contact")}</a>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const btn = document.querySelector("[data-menu-btn]");
+      const menu = document.getElementById("mobile-menu");
+      if (btn && menu) {
+        btn.addEventListener("click", () => {
+          const next = menu.classList.contains("hidden");
+          menu.classList.toggle("hidden", !next);
+          btn.setAttribute("aria-expanded", String(next));
+        });
+      }
+    });
+  </script>
+</header>
+

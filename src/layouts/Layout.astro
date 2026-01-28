@@ -1,0 +1,61 @@
+---
+import "../styles/global.css";
+
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const {
+  title = "Danatar — IT Services",
+  description = "Web design, SEO, online marketing, business automation, product & print design, mobile apps, code help, consulting, and logos.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="ru" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-dvh bg-app text-slate-900 antialiased">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10">
+      <div class="absolute inset-0 bg-grid opacity-[0.35]"></div>
+      <div class="absolute -top-24 left-1/2 h-[520px] w-[920px] -translate-x-1/2 rounded-full bg-glow blur-3xl"></div>
+    </div>
+
+    <slot />
+
+    <script type="module">
+      import { initI18n, setLanguage, getCurrentLanguage } from "../i18n";
+
+      const syncLanguageUi = () => {
+        const current = getCurrentLanguage();
+        document.querySelectorAll("[data-lang]").forEach((el) => {
+          const btn = el;
+          const isActive = btn.getAttribute("data-lang") === current;
+          btn.toggleAttribute("data-active", isActive);
+          btn.classList.toggle("ring-2", isActive);
+          btn.classList.toggle("ring-indigo-500/60", isActive);
+        });
+      };
+
+      await initI18n();
+      syncLanguageUi();
+
+      document.addEventListener("click", async (e) => {
+        const target = e.target instanceof HTMLElement ? e.target.closest("[data-lang]") : null;
+        const lang = target?.getAttribute("data-lang");
+        if (!lang) return;
+        await setLanguage(lang);
+        syncLanguageUi();
+      });
+    </script>
+  </body>
+</html>
+

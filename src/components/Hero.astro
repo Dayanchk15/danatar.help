@@ -1,0 +1,31 @@
+---
+import { tr } from "../i18n/ssr";
+---
+
+<section class="py-10 sm:py-14">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div class="card overflow-hidden rounded-3xl p-8 sm:p-10">
+      <div class="max-w-3xl">
+        <p class="text-sm font-semibold text-indigo-600" data-i18n="hero.kicker">{tr("hero.kicker")}</p>
+        <h1 class="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl" data-i18n="hero.title">
+          {tr("hero.title")}
+        </h1>
+        <p class="mt-4 text-lg text-muted" data-i18n="hero.subtitle">{tr("hero.subtitle")}</p>
+
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a class="btn btn-primary" href="#services" data-i18n="hero.ctaPrimary">{tr("hero.ctaPrimary")}</a>
+          <a class="btn" href="#contact" data-i18n="hero.ctaSecondary">{tr("hero.ctaSecondary")}</a>
+        </div>
+
+        <div class="mt-8 flex flex-wrap gap-2 text-sm">
+          <span class="pill" data-i18n="hero.badges.web">{tr("hero.badges.web")}</span>
+          <span class="pill" data-i18n="hero.badges.seo">{tr("hero.badges.seo")}</span>
+          <span class="pill" data-i18n="hero.badges.marketing">{tr("hero.badges.marketing")}</span>
+          <span class="pill" data-i18n="hero.badges.automation">{tr("hero.badges.automation")}</span>
+          <span class="pill" data-i18n="hero.badges.branding">{tr("hero.badges.branding")}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+

@@ -1,0 +1,14 @@
+---
+type Props = {
+  class?: string;
+};
+
+const { class: className = "" } = Astro.props;
+---
+
+<div class={`inline-flex items-center gap-2 ${className}`}>
+  <button class="pill text-sm" data-lang="ru" type="button">RU</button>
+  <button class="pill text-sm" data-lang="tk" type="button">TK</button>
+  <button class="pill text-sm" data-lang="en" type="button">EN</button>
+</div>
+

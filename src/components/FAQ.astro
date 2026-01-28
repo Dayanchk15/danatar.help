@@ -1,0 +1,40 @@
+---
+import { tr } from "../i18n/ssr";
+---
+
+<section id="faq" class="py-10 sm:py-14">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl">
+      <h2 class="text-2xl font-semibold tracking-tight" data-i18n="faq.title">{tr("faq.title")}</h2>
+      <p class="mt-2 text-muted" data-i18n="faq.subtitle">{tr("faq.subtitle")}</p>
+    </div>
+
+    <div class="mt-8 grid gap-4">
+      <details class="card rounded-2xl p-6">
+        <summary class="cursor-pointer text-base font-semibold" data-i18n="faq.items.1.q">{tr("faq.items.1.q")}</summary>
+        <p class="mt-2 text-sm text-muted" data-i18n="faq.items.1.a">
+          {tr("faq.items.1.a")}
+        </p>
+      </details>
+      <details class="card rounded-2xl p-6">
+        <summary class="cursor-pointer text-base font-semibold" data-i18n="faq.items.2.q">{tr("faq.items.2.q")}</summary>
+        <p class="mt-2 text-sm text-muted" data-i18n="faq.items.2.a">
+          {tr("faq.items.2.a")}
+        </p>
+      </details>
+      <details class="card rounded-2xl p-6">
+        <summary class="cursor-pointer text-base font-semibold" data-i18n="faq.items.3.q">{tr("faq.items.3.q")}</summary>
+        <p class="mt-2 text-sm text-muted" data-i18n="faq.items.3.a">
+          {tr("faq.items.3.a")}
+        </p>
+      </details>
+      <details class="card rounded-2xl p-6">
+        <summary class="cursor-pointer text-base font-semibold" data-i18n="faq.items.4.q">{tr("faq.items.4.q")}</summary>
+        <p class="mt-2 text-sm text-muted" data-i18n="faq.items.4.a">
+          {tr("faq.items.4.a")}
+        </p>
+      </details>
+    </div>
+  </div>
+</section>
+

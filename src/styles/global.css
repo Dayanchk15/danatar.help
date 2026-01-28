@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --app-bg: radial-gradient(1200px 600px at 50% -10%, rgba(99, 102, 241, 0.18), transparent 60%),
+      radial-gradient(900px 540px at 20% 20%, rgba(20, 184, 166, 0.12), transparent 55%),
+      radial-gradient(900px 540px at 85% 25%, rgba(236, 72, 153, 0.10), transparent 60%),
+      linear-gradient(to bottom, #f8fafc, #ffffff);
+    --card: rgba(255, 255, 255, 0.9);
+    --border: rgba(15, 23, 42, 0.10);
+    --muted: rgba(15, 23, 42, 0.65);
+    --shadow: 0 10px 30px rgba(2, 6, 23, 0.10);
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    background: var(--app-bg);
+  }
+
+  ::selection {
+    background: rgba(99, 102, 241, 0.25);
+  }
+}
+
+@layer utilities {
+  .bg-app {
+    background: var(--app-bg);
+  }
+
+  .bg-grid {
+    background-image: linear-gradient(to right, rgba(15, 23, 42, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(closest-side, rgba(0, 0, 0, 0.85), transparent);
+  }
+
+  .bg-glow {
+    background: radial-gradient(closest-side, rgba(99, 102, 241, 0.22), transparent 70%);
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+  }
+
+  .text-muted {
+    color: var(--muted);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    padding: 0.65rem 1rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+    transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+  }
+
+  .btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(15, 23, 42, 0.18);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary {
+    color: white;
+    border-color: rgba(79, 70, 229, 0.45);
+    background: linear-gradient(90deg, rgba(79, 70, 229, 0.95), rgba(37, 99, 235, 0.92));
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(90deg, rgba(79, 70, 229, 1), rgba(37, 99, 235, 0.98));
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.35rem 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+  }
+}

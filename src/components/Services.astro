@@ -1,0 +1,74 @@
+---
+import { categories, services } from "../data/services";
+import { tr } from "../i18n/ssr";
+---
+
+<section id="services" class="py-10 sm:py-14">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl">
+      <h2 class="text-2xl font-semibold tracking-tight" data-i18n="services.title">Services</h2>
+      <p class="mt-2 text-muted" data-i18n="services.subtitle">Pick a category to explore what we do.</p>
+    </div>
+
+    <div class="mt-7 flex flex-wrap gap-2" id="service-filters">
+      {categories.map((c) => (
+        <button class="pill text-sm" type="button" data-service-category={c.id} data-i18n={c.i18nKey}>
+          {tr(c.i18nKey)}
+        </button>
+      ))}
+    </div>
+
+    <div class="mt-6 grid gap-4 md:grid-cols-2" id="service-grid">
+      {services.map((s) => (
+        <article
+          class="card rounded-2xl p-6"
+          data-service-item
+          data-service-tags={s.categoryIds.join(",")}
+        >
+          <h3 class="text-lg font-semibold" data-i18n={s.titleKey}>{tr(s.titleKey)}</h3>
+          <p class="mt-2 text-sm text-muted" data-i18n={s.descKey}>{tr(s.descKey)}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+
+  <script type="module">
+    import { applyTranslations } from "../i18n";
+
+    const root = document.getElementById("services");
+    if (!root) throw new Error("services root not found");
+
+    const filterBar = root.querySelector("#service-filters");
+    const items = Array.from(root.querySelectorAll("[data-service-item]"));
+    const filterButtons = Array.from(root.querySelectorAll("[data-service-category]"));
+
+    const getTags = (el) => (el.getAttribute("data-service-tags") ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+
+    let active = "all";
+
+    const applyFilter = () => {
+      filterButtons.forEach((btn) => {
+        const isActive = btn.getAttribute("data-service-category") === active;
+        btn.classList.toggle("ring-2", isActive);
+        btn.classList.toggle("ring-indigo-500/60", isActive);
+      });
+
+      items.forEach((card) => {
+        const tags = getTags(card);
+        const visible = active === "all" ? true : tags.includes(active);
+        card.toggleAttribute("hidden", !visible);
+      });
+    };
+
+    filterBar?.addEventListener("click", (e) => {
+      const target = e.target instanceof HTMLElement ? e.target.closest("[data-service-category]") : null;
+      const next = target?.getAttribute("data-service-category");
+      if (!next) return;
+      active = next;
+      applyFilter();
+    });
+
+    applyFilter();
+  </script>
+</section>
+
