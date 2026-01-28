@@ -2,9 +2,8 @@ import { initReveals } from "./reveals";
 
 const PRESERVE_SCROLL = true;
 const UPDATE_URL = true;
-// For stability and performance, we use full page navigations for language switches.
-// Set to true to re-enable SPA-style language switching.
-const ENABLE_LANG_SPA = false;
+// SPA-style language switching: no page reload, smooth transitions
+const ENABLE_LANG_SPA = true;
 
 function replaceOrKeep<T extends Element>(
   current: T | null,

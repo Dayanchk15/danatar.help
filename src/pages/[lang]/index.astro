@@ -217,6 +217,8 @@ const t = useTranslations(lang);
 
   .about {
     padding: 2rem 0 0;
+    position: relative;
+    z-index: 10; /* Above the sphere (z-index: 1) */
   }
 
   .about-inner {
@@ -245,6 +247,8 @@ const t = useTranslations(lang);
 
   .contact {
     padding: 6rem 0 8rem;
+    position: relative;
+    z-index: 10; /* Above the sphere (z-index: 1) */
   }
 
   .contact-inner {

@@ -43,6 +43,8 @@ const { logoUrl, logoAlt, links } = Astro.props;
     --fs: var(--font-size-sm);
     display: block;
     clip-path: inset(0);
+    position: relative;
+    z-index: 10; /* Above the sphere (z-index: 1) */
 
     :global(&.has-no-anim footer) {
       position: static;

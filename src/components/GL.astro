@@ -39,6 +39,15 @@
   renderer.setClearColor("#fff");
   renderer.setClearAlpha(0);
 
+  // Performance optimization: simplify animations on mobile and for users who prefer reduced motion
+  const prefersReducedMotion =
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+  const isMobile = window.innerWidth < 768;
+  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+  
+  // Always enable GL, but use simpler animations on mobile/tablet
+  const SIMPLIFY_ANIMATIONS = isMobile || isTablet || prefersReducedMotion;
+
   const radius = 1;
   const detail = 2;
   const baseGeo = new THREE.IcosahedronGeometry(radius, detail);
@@ -482,16 +491,21 @@ void main() {
   uniform WaveLayer uWaveLayers[WAVES];
 
   varying vec3 vColor;
+  varying vec3 vNormal;
+  varying vec3 vPosition;
   varying vec2 vUv;
 
   void main() {
     vUv = uv;
+    vNormal = normalize(normalMatrix * normal);
+    vPosition = position;
+    
     float sp = uTime * uNoiseSpeed + uVel * 0.0007;
     vec3 pos = position;
     vec3 color = uBaseColor;
-    vec2 uvNorm = uv * 2.0 - 1.0;
-    vec2 noiseCoord = uResolution * uvNorm * uNoiseFreq;
-
+    
+    // Use 3D position for noise instead of UV for spherical effect
+    vec3 noiseCoord = pos * uNoiseFreq.x * 2.0;
 
     for (int i = 0; i < WAVES; i++) {
       WaveLayer layer = uWaveLayers[i];
@@ -501,7 +515,7 @@ void main() {
         snoise(vec3(
           noiseCoord.x * layer.noiseFreq.x + sp * layer.noiseFlow,
           noiseCoord.y * layer.noiseFreq.y,
-          sp * layer.noiseSpeed + layer.noiseSeed
+          noiseCoord.z * layer.noiseFreq.y + sp * layer.noiseSpeed + layer.noiseSeed
         )) * 0.5 + 0.5
       );
 
@@ -516,18 +530,29 @@ void main() {
   const fragmentShader = `
   precision highp float;
 
-  uniform float uAlpha;
-
   varying vec2 vUv;
   varying vec3 vColor;
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+
   void main() {
-    float dist = distance(vUv, vec2(0.5, 0.5));
-
-    if (dist > 0.5) {
-        discard;
-    }
-
-    gl_FragColor = vec4(vColor * uAlpha, 1.0 * uAlpha);
+    // Calculate lighting for 3D sphere effect
+    vec3 normal = normalize(vNormal);
+    
+    // Simple directional light from top-right
+    vec3 lightDir = normalize(vec3(0.5, 0.8, 0.3));
+    float lightIntensity = max(dot(normal, lightDir), 0.3); // Minimum 0.3 for ambient
+    
+    // Add rim lighting for more depth
+    vec3 viewDir = normalize(-vPosition);
+    float rim = 1.0 - max(dot(viewDir, normal), 0.0);
+    rim = pow(rim, 2.0) * 0.3;
+    
+    // Combine lighting with color
+    vec3 finalColor = vColor * lightIntensity + rim;
+    
+    // Always fully opaque - never transparent
+    gl_FragColor = vec4(finalColor, 1.0);
   }
   `;
 
@@ -541,43 +566,53 @@ void main() {
     },
     uNoiseSpeed: { value: 0.000005 },
     uWaveLayers: { value: waves },
-    uAlpha: { value: 0 },
+    uAlpha: { value: 1.0 },
   };
 
   const material = new THREE.ShaderMaterial({
     vertexShader,
     fragmentShader,
     uniforms,
+    transparent: false, // Fully opaque - no transparency
+    depthWrite: true, // Ensure proper depth rendering
+    depthTest: true,
   });
 
-  const geometry = new THREE.PlaneGeometry(1.7, 1.7, 100, 100);
+  // Use sphere geometry instead of plane for 3D volumetric effect
+  const geometry = new THREE.SphereGeometry(0.85, 64, 64);
   const circle = new THREE.Mesh(geometry, material);
+  // Ensure circle is always visible and rendered properly, regardless of rotation
+  circle.renderOrder = 1; // Render after panels
+  circle.position.z = 0.01; // Slightly in front to ensure visibility
   ballGroup.add(circle);
 
   const mouse = new THREE.Vector2();
   const toggled = new Set<number>();
 
-  document.addEventListener("pointermove", (event) => {
-    event.preventDefault();
+  // Only enable interactive features on desktop for performance
+  if (!SIMPLIFY_ANIMATIONS) {
+    document.addEventListener("pointermove", (event) => {
+      event.preventDefault();
 
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  });
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    });
 
-  window.addEventListener("pointerdown", () => {
-    raycaster.setFromCamera(mouse, camera);
+    window.addEventListener("pointerdown", () => {
+      raycaster.setFromCamera(mouse, camera);
 
-    const intersect = raycaster.intersectObjects(
-      panelsGroup.children,
-      false,
-    )[0];
+      const intersect = raycaster.intersectObjects(
+        panelsGroup.children,
+        false,
+      )[0];
 
-    if (intersect) {
-      const hit = intersect.object;
-      const idx = faceData.findIndex((f) => f.mesh === hit);
-      if (idx >= 0) togglePanel(idx);
-    }
-  });
+      if (intersect) {
+        const hit = intersect.object;
+        const idx = faceData.findIndex((f) => f.mesh === hit);
+        if (idx >= 0) togglePanel(idx);
+      }
+    });
+  }
 
   function togglePanel(idx: number) {
     const data = faceData[idx];
@@ -622,46 +657,99 @@ void main() {
   let pixelToUnit = -frustumSize / window.innerHeight;
   let isPlaced = true;
 
+  // Smooth interpolation for fluid motion (prevents jerky movements)
+  let currentX = 0;
+  let currentY = 0;
+
   function animate(t: number) {
     uniforms.uTime.value = t * 1000;
+    
+    // Force sphere to be fully opaque - never transparent
+    uniforms.uAlpha.value = 1.0;
 
     const vel = isPlaced ? 0 : window.scrollVelocity;
     const abs = Math.abs(vel);
     const dir = window.scrollDirection || 1;
 
-    // Subtle rotation depending on scroll direction/speed
-    panelsGroup.rotation.y += (0.002 + abs * 0.001) * dir;
-    panelsGroup.rotation.x += (0.002 + abs * 0.001) * -dir;
+    // Simplified rotation: less intensive on mobile
+    const rotBase = SIMPLIFY_ANIMATIONS ? 0.001 : 0.002;
+    const rotSpeed = SIMPLIFY_ANIMATIONS ? 0.0005 : 0.001;
+    panelsGroup.rotation.y += (rotBase + abs * rotSpeed) * dir;
+    panelsGroup.rotation.x += (rotBase + abs * rotSpeed) * -dir;
 
     smoothVel += (abs - smoothVel) * 0.05;
     globals.uVel.value = smoothVel;
-    camera.position.y =
-      (window.scrollCurrent ?? window.scrollY ?? 0) * pixelToUnit;
+    const scrollY = window.scrollCurrent ?? window.scrollY ?? 0;
+    camera.position.y = scrollY * pixelToUnit;
 
-    // ---- Stable background motion: middle of right edge ----
-    const scroll = window.scrollY || 0;
-    const tt = scroll * 0.0016 + t * 0.0006;
+    // ---- Motion with scroll: sphere in right half of screen, centered vertically ----
+    const freqMultiplier = SIMPLIFY_ANIMATIONS ? 0.5 : 1.0;
+    // Movement depends on both scroll and time
+    const tt = scrollY * 0.0006 * freqMultiplier + t * 0.0003 * freqMultiplier;
 
+    // Screen is divided in half - sphere stays in right half
     const maxX = (frustumSize * aspect) / 2;
     const screenWidth = window.innerWidth || 1;
     const unitsPerScreenX = (frustumSize * aspect) / screenWidth;
-    const offsetUnits = 25 * unitsPerScreenX; // keep a bit away from the edge
-    const baseX = maxX * 0.8 - offsetUnits;
+    
+    // Right half starts at center (0) and goes to maxX
+    // Position sphere in the middle of right half (at 75% of screen width)
+    const rightHalfCenter = maxX * 0.5; // Center of right half
+    const offsetFromEdge = 25 * unitsPerScreenX; // Small offset from edge
+    const baseX = rightHalfCenter - offsetFromEdge;
 
     const speed = Math.min(abs, 20);
-    const amp = 0.4 + 0.04 * speed;
+    // Reduced amplitude for smoother movement
+    const ampBase = SIMPLIFY_ANIMATIONS ? 0.2 : 0.3;
+    const ampMultiplier = SIMPLIFY_ANIMATIONS ? 0.02 : 0.03;
+    const amp = ampBase + ampMultiplier * speed;
 
-    // Horizontal sway on the right side
-    const swayX =
-      Math.sin(tt * 1.4) * (0.8 * amp) +
-      Math.sin(tt * 3.1 + 1.1) * (0.3 * amp);
-    ballGroup.position.x = baseX + swayX;
+    // Horizontal sway - movement in right half
+    const swayX = SIMPLIFY_ANIMATIONS
+      ? Math.sin(tt * 0.7) * (0.4 * amp)
+      : Math.sin(tt * 0.8) * (0.5 * amp) + Math.sin(tt * 1.5 + 1.0) * (0.25 * amp);
+    const targetX = baseX + swayX;
 
-    // Vertical bobbing strictly around vertical center; never sticks to top/bottom
-    const bobY =
-      Math.sin(tt) * (0.7 * amp) +
-      Math.cos(tt * 0.7 + 2.0) * (0.25 * amp);
-    ballGroup.position.y = camera.position.y + bobY;
+    // Vertical bobbing - centered vertically
+    const bobY = SIMPLIFY_ANIMATIONS
+      ? Math.sin(tt * 0.6) * (0.3 * amp)
+      : Math.sin(tt * 0.7) * (0.4 * amp) + Math.cos(tt * 0.6 + 1.8) * (0.2 * amp);
+    
+    // Sphere follows camera exactly - no parallax, no lag
+    let targetY = camera.position.y + bobY;
+    
+    // Prevent sphere from going into footer area
+    const footerEl = document.querySelector("sy-footer");
+    if (footerEl) {
+      const footerRect = footerEl.getBoundingClientRect();
+      const footerTop = footerRect.top + window.scrollY;
+      const footerTopInUnits = -(footerTop - window.innerHeight / 2) * pixelToUnit;
+      
+      // Limit sphere Y position to stay above footer
+      const sphereRadius = 0.85; // Sphere radius in world units
+      const maxY = footerTopInUnits - sphereRadius - 0.5; // Keep sphere above footer with margin
+      
+      if (targetY > maxY) {
+        targetY = maxY;
+      }
+    }
+
+    // Smooth interpolation (lerp) - eliminates jerky movements
+    const lerpFactor = SIMPLIFY_ANIMATIONS ? 0.1 : 0.12;
+    currentX += (targetX - currentX) * lerpFactor;
+    currentY += (targetY - currentY) * lerpFactor;
+
+    ballGroup.position.x = currentX;
+    ballGroup.position.y = currentY;
+
+    // Rotation speed depends on scroll speed and direction
+    const baseRotSpeed = SIMPLIFY_ANIMATIONS ? 0.002 : 0.003;
+    const scrollRotSpeed = Math.min(abs * 0.0004, 0.015); // Speed increases with scroll speed
+    const ballRotSpeed = baseRotSpeed + scrollRotSpeed;
+    
+    ballGroup.rotation.y += ballRotSpeed * dir;
+    ballGroup.rotation.x += ballRotSpeed * dir * 0.7;
+    ballGroup.rotation.z += ballRotSpeed * dir * -0.5;
 
     const s = ballGroup.scale.x;
     if (Number.isFinite(s) && s > 0.05) {
@@ -676,8 +764,20 @@ void main() {
     panelsGroup.visible = true;
     renderer.render(scene, camera);
   }
-  gsap.ticker.fps(60);
+
+  // Always enable animation, but use lower FPS on mobile for performance
+  const targetFPS = SIMPLIFY_ANIMATIONS ? 30 : 45;
+  gsap.ticker.fps(targetFPS);
   gsap.ticker.add(animate);
+
+  // Pause animation when tab is hidden to save CPU/GPU
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      gsap.ticker.remove(animate);
+    } else {
+      gsap.ticker.add(animate);
+    }
+  });
 
   const alphas: unknown[] = [];
   const displaces: unknown[] = [];
@@ -706,10 +806,9 @@ void main() {
       delay: "random(0, 0.2)",
     });
 
-    gsap.to(uniforms.uAlpha, {
-      value: 1,
-      duration: 0.5,
-    });
+    // Circle (gradient sphere) is always fully opaque - no animation needed
+    // Fragment shader ignores uAlpha and always renders at full opacity
+    uniforms.uAlpha.value = 1.0;
 
     displaces.splice(0, displaces.length);
     alphas.splice(0, displaces.length);
@@ -964,4 +1063,6 @@ void main() {
     top: 0;
     left: 0;
   }
+
+  /* Visual divider removed - invisible */
 </style>
