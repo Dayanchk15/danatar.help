@@ -1,0 +1,538 @@
+---
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+---
+
+<sy-contact-form>
+  <div class="modal-overlay" data-form-overlay>
+    <div class="modal-content">
+      <button class="modal-close" data-form-close aria-label="Close">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      
+      <form class="contact-form" data-contact-form>
+        <h2 class="u-heading form-title" data-lang-key="form.title"></h2>
+        <p class="u-text form-subtitle" data-lang-key="form.subtitle"></p>
+        
+        <div class="form-group">
+          <label for="name" class="u-text" data-lang-key="form.name"></label>
+          <input type="text" id="name" name="name" required class="u-text" />
+        </div>
+        
+        <div class="form-group">
+          <label for="email" class="u-text" data-lang-key="form.email"></label>
+          <input type="email" id="email" name="email" required class="u-text" />
+        </div>
+        
+        <div class="form-group">
+          <label for="phone" class="u-text" data-lang-key="form.phone"></label>
+          <input type="tel" id="phone" name="phone" class="u-text" />
+        </div>
+        
+        <div class="form-group">
+          <label for="message" class="u-text" data-lang-key="form.message"></label>
+          <textarea id="message" name="message" rows="5" required class="u-text"></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary u-text" data-lang-key="form.submit">
+          <span>
+            <span data-lang-text="form.submit"></span>
+            <span aria-hidden data-lang-text="form.submit"></span>
+          </span>
+        </button>
+      </form>
+    </div>
+  </div>
+</sy-contact-form>
+
+<script>
+  import { useTranslations } from "../i18n/utils";
+  
+  const lang = (document.documentElement.lang || "ru") as keyof typeof import("../i18n/ui").languages;
+  const t = useTranslations(lang);
+  
+  const translations: Record<string, Record<string, string>> = {
+    ru: {
+      "form.title": "Связаться с нами",
+      "form.subtitle": "Заполните форму, и мы свяжемся с вами в ближайшее время",
+      "form.name": "Имя",
+      "form.email": "Email",
+      "form.phone": "Телефон",
+      "form.message": "Сообщение",
+      "form.submit": "Отправить",
+    },
+    tk: {
+      "form.title": "Biz bilen habarlaşyň",
+      "form.subtitle": "Formany dolduryň, biz ýakyn wagtyňyzda siz bilen habarlaşarys",
+      "form.name": "Ady",
+      "form.email": "Email",
+      "form.phone": "Telefon",
+      "form.message": "Habarlaşma",
+      "form.submit": "Ibermek",
+    },
+    en: {
+      "form.title": "Contact us",
+      "form.subtitle": "Fill out the form and we'll get back to you soon",
+      "form.name": "Name",
+      "form.email": "Email",
+      "form.phone": "Phone",
+      "form.message": "Message",
+      "form.submit": "Send",
+    },
+  };
+  
+  function updateFormTexts() {
+    const currentLang = (document.documentElement.lang || "ru") as keyof typeof translations;
+    const t = translations[currentLang] || translations.ru;
+    
+    document.querySelectorAll("[data-lang-key]").forEach((el) => {
+      const key = el.getAttribute("data-lang-key");
+      if (key && t[key]) {
+        if (el.hasAttribute("data-lang-text")) {
+          el.textContent = t[key];
+        } else {
+          el.textContent = t[key];
+        }
+      }
+    });
+  }
+  
+  let scrollPosition = 0;
+  let wheelHandler: ((e: WheelEvent) => void) | null = null;
+  let touchHandler: ((e: TouchEvent) => void) | null = null;
+  let scrollHandler: ((e: Event) => void) | null = null;
+  let modalWheelHandler: ((e: WheelEvent) => void) | null = null;
+  let currentOverlay: HTMLElement | null = null;
+  let currentModalContent: HTMLElement | null = null;
+
+  function openForm() {
+    const overlay = document.querySelector<HTMLElement>("[data-form-overlay]");
+    const modalContent = document.querySelector<HTMLElement>(".modal-content");
+    if (overlay && modalContent) {
+      currentOverlay = overlay;
+      currentModalContent = modalContent;
+      // Сохраняем текущую позицию скролла
+      scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      
+      overlay.classList.add("active");
+      
+      // Фиксируем позицию и отключаем скролл
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollPosition}px`;
+      document.body.style.width = "100%";
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      
+      // Обработчик для wheel событий
+      wheelHandler = (e: WheelEvent) => {
+        // Используем composedPath для проверки пути события
+        const path = e.composedPath();
+        
+        // Проверяем, проходит ли событие через модальное окно
+        const isInsideModalContent = path.some((node) => {
+          const el = node as HTMLElement;
+          return el === modalContent || (el.nodeType === 1 && modalContent.contains(el));
+        });
+        
+        if (isInsideModalContent) {
+          // Если событие внутри модального окна - разрешаем скролл модального окна
+          // Не блокируем событие, чтобы модальное окно могло скроллиться
+          return;
+        }
+        
+        // Блокируем скролл для всего остального (overlay и основной сайт)
+        e.preventDefault();
+        e.stopPropagation();
+      };
+      
+      // Обработчик для touch событий
+      touchHandler = (e: TouchEvent) => {
+        const target = e.target as HTMLElement;
+        
+        // Если событие происходит внутри модального окна - разрешаем
+        if (modalContent.contains(target) || overlay.contains(target)) {
+          return;
+        }
+        
+        // Блокируем для всего остального
+        e.preventDefault();
+        e.stopPropagation();
+      };
+      
+      // Обработчик для scroll событий (дополнительная защита)
+      scrollHandler = (e: Event) => {
+        const target = e.target as HTMLElement;
+        
+        // Разрешаем скролл внутри модального окна
+        if (modalContent.contains(target) || target === modalContent || target === overlay) {
+          return;
+        }
+        
+        // Блокируем скролл основного сайта
+        e.preventDefault();
+        window.scrollTo(0, scrollPosition);
+      };
+      
+      // Добавляем обработчик на модальное окно в фазе capture, чтобы разрешить скролл
+      modalWheelHandler = (e: WheelEvent) => {
+        // Разрешаем скролл модального окна - не блокируем событие
+        // Останавливаем всплытие, чтобы overlay не блокировал
+        e.stopPropagation();
+      };
+      modalContent.addEventListener("wheel", modalWheelHandler, { passive: true, capture: true });
+      
+      // Добавляем обработчики на overlay для блокировки скролла основного сайта
+      // Обработчик будет проверять путь события и разрешать скролл внутри модального окна
+      overlay.addEventListener("wheel", wheelHandler, { passive: false });
+      overlay.addEventListener("touchmove", touchHandler, { passive: false });
+      
+      // Обработчик scroll на window для блокировки скролла основного сайта
+      window.addEventListener("scroll", scrollHandler, { passive: false });
+      
+      updateFormTexts();
+    }
+  }
+  
+  function closeForm() {
+    const overlay = currentOverlay || document.querySelector<HTMLElement>("[data-form-overlay]");
+    if (overlay) {
+      overlay.classList.remove("active");
+      
+      // Удаляем обработчики с overlay
+      if (wheelHandler && overlay) {
+        overlay.removeEventListener("wheel", wheelHandler);
+        wheelHandler = null;
+      }
+      if (touchHandler && overlay) {
+        overlay.removeEventListener("touchmove", touchHandler);
+        touchHandler = null;
+      }
+      if (scrollHandler) {
+        window.removeEventListener("scroll", scrollHandler);
+        scrollHandler = null;
+      }
+      
+      // Удаляем обработчик с модального окна
+      if (modalWheelHandler && currentModalContent) {
+        currentModalContent.removeEventListener("wheel", modalWheelHandler, { capture: true } as any);
+        modalWheelHandler = null;
+        currentModalContent = null;
+      }
+      
+      // Восстанавливаем скролл
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      
+      // Восстанавливаем позицию скролла
+      window.scrollTo(0, scrollPosition);
+      scrollPosition = 0;
+      currentOverlay = null;
+    }
+  }
+  
+  // Open form when clicking "Написать" button
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    const link = target.closest(".contact-cta");
+    if (link) {
+      e.preventDefault();
+      openForm();
+    }
+  });
+  
+  // Close form handlers
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (target.hasAttribute("data-form-close") || target.closest("[data-form-close]")) {
+      closeForm();
+    }
+    if (target.hasAttribute("data-form-overlay") && target === e.target) {
+      closeForm();
+    }
+  });
+  
+  // Handle form submission
+  const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+      
+      // Here you would normally send the data to a server
+      // For now, we'll just log it and show a success message
+      console.log("Form data:", data);
+      
+      // Create mailto link as fallback
+      const subject = encodeURIComponent("Contact Form Submission");
+      const body = encodeURIComponent(
+        `Name: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone || "N/A"}\n\nMessage:\n${data.message}`
+      );
+      window.location.href = `mailto:hello@example.com?subject=${subject}&body=${body}`;
+      
+      closeForm();
+    });
+  }
+  
+  // Update texts when language changes
+  document.addEventListener("langchange", updateFormTexts);
+  updateFormTexts();
+</script>
+
+<style>
+  sy-contact-form {
+    display: block;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(var(--rgb-brand-1), 0.25);
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease-out-cubic);
+  }
+  
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  
+  .modal-content {
+    position: relative;
+    background: rgba(var(--rgb-brand-3), 0.85);
+    backdrop-filter: blur(20px) saturate(1.2);
+    border: 1px solid rgba(var(--rgb-brand-1), 0.3);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    max-width: 26rem;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 0 20px 60px rgba(var(--rgb-brand-1), 0.2), 0 0 0 1px rgba(var(--rgb-brand-1), 0.1);
+    transform: scale(0.95) translateY(1rem);
+    transition: transform 0.3s var(--ease-out-cubic), opacity 0.3s var(--ease-out-cubic);
+    opacity: 0;
+  }
+  
+  /* Кастомный скроллбар для модального окна */
+  .modal-content::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .modal-content::-webkit-scrollbar-track {
+    background: rgba(var(--rgb-brand-3), 0.3);
+    border-radius: 4px;
+  }
+  
+  .modal-content::-webkit-scrollbar-thumb {
+    background: rgba(var(--rgb-brand-1), 0.5);
+    border-radius: 4px;
+  }
+  
+  .modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--rgb-brand-1), 0.7);
+  }
+  
+  .modal-overlay.active .modal-content {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    background: rgba(var(--rgb-brand-1), 0.8);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-white);
+    border-radius: 50%;
+    border: 1px solid rgba(var(--rgb-white), 0.3);
+    transition: background 0.2s var(--ease-out-cubic), transform 0.2s var(--ease-out-cubic), box-shadow 0.2s var(--ease-out-cubic);
+    box-shadow: 0 4px 12px rgba(var(--rgb-brand-1), 0.3);
+  }
+  
+  .modal-close:hover {
+    background: rgba(var(--rgb-brand-5), 0.9);
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(var(--rgb-brand-5), 0.4);
+  }
+  
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+  }
+  
+  .form-title {
+    --fs: 2rem;
+    --lh: 1.1;
+    margin: 0 0 0.375rem 0;
+    text-align: center;
+    color: var(--color-brand-1);
+    font-weight: 700;
+  }
+  
+  .form-subtitle {
+    --fs: var(--font-size-sm);
+    margin: 0 0 1rem 0;
+    color: var(--color-text);
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+  
+  .form-group label {
+    --fs: var(--font-size-sm);
+    --fw: 600;
+    color: var(--color-brand-1);
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    --fs: var(--font-size-sm);
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(var(--rgb-brand-1), 0.3);
+    border-radius: 0.75rem;
+    background: rgba(var(--rgb-white), 0.7);
+    backdrop-filter: blur(10px);
+    color: var(--color-text);
+    font-family: var(--font-inter);
+    transition: border-color 0.2s var(--ease-out-cubic), background 0.2s var(--ease-out-cubic), box-shadow 0.2s var(--ease-out-cubic);
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-brand-1);
+    background: rgba(var(--rgb-white), 0.9);
+    box-shadow: 0 0 0 3px rgba(var(--rgb-brand-1), 0.1);
+  }
+  
+  .form-group textarea {
+    resize: both;
+    min-height: 80px;
+    max-height: 300px;
+    font-family: inherit;
+  }
+  
+  .contact-form .btn {
+    --fs: var(--font-size-xs);
+    --fw: 600;
+    --text-color: var(--color-white);
+    --bg-color: var(--color-brand-1);
+    --hover-bg-color: var(--color-white);
+    --hover-text-color: var(--color-brand-1);
+    
+    margin-top: 0.25rem;
+    align-self: flex-start;
+    cursor: pointer;
+    padding: 0;
+    border: none;
+    background: var(--bg-color);
+    letter-spacing: 0.02em;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    border-radius: 100px;
+    box-shadow: 0 4px 12px rgba(var(--rgb-brand-1), 0.3);
+    transition: box-shadow 0.2s var(--ease-out-cubic);
+  }
+  
+  .contact-form .btn:hover {
+    box-shadow: 0 6px 16px rgba(var(--rgb-brand-1), 0.4);
+  }
+  
+  .contact-form .btn > span {
+    display: block;
+  }
+  
+  .contact-form .btn > span:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 99px;
+    border: 2px solid var(--bg-color);
+    z-index: 2;
+  }
+  
+  .contact-form .btn > span > span {
+    color: var(--text-color);
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0.875em 1.375em;
+    line-height: 1.25;
+    background: var(--bg-color);
+  }
+  
+  .contact-form .btn > span > span:first-child {
+    transition: clip-path 0.25s var(--ease-out-cubic);
+    color: var(--hover-text-color);
+    background: var(--hover-bg-color);
+    z-index: 2;
+    position: absolute;
+    clip-path: inset(50% round 99px);
+  }
+  
+  .contact-form .btn:hover > span > span:first-child,
+  .contact-form .btn:focus > span > span:first-child {
+    clip-path: inset(-100% 0 round 99px);
+  }
+
+  @media (max-width: 640px) {
+    .modal-content {
+      max-width: calc(100% - 2rem);
+      padding: 1.25rem;
+      max-height: 90vh;
+    }
+
+    .form-title {
+      --fs: 1.75rem;
+    }
+
+    .contact-form {
+      gap: 1rem;
+    }
+
+    .form-group textarea {
+      min-height: 70px;
+    }
+  }
+</style>

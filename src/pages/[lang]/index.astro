@@ -10,6 +10,7 @@ import Introducing from "../../components/Introducing.astro";
 import GL from "../../components/GL.astro";
 import GLPlaces from "../../components/GlPlaces.astro";
 import Services from "../../components/Services.astro";
+import ContactForm from "../../components/ContactForm.astro";
 
 import { languages } from "../../i18n/ui";
 import { useTranslations } from "../../i18n/utils";
@@ -31,7 +32,7 @@ const t = useTranslations(lang);
     subtitle={t("hero.subtitle")}
     cta={{
       title: t("hero.cta"),
-      url: `/${lang}/#contact`,
+      url: "#contact",
     }}
   />
 
@@ -185,7 +186,7 @@ const t = useTranslations(lang);
     <div class="contact-inner">
       <h2 class="u-heading contact-title" data-sy-reveal="words">{t("contact.title")}</h2>
       <p class="u-text contact-text" data-sy-reveal="lines">{t("contact.text")}</p>
-      <a class="contact-cta" href="mailto:hello@example.com">{t("contact.cta")}</a>
+      <button class="contact-cta" type="button">{t("contact.cta")}</button>
     </div>
   </section>
 
@@ -207,6 +208,7 @@ const t = useTranslations(lang);
 
   <GL />
   <GLPlaces />
+  <ContactForm lang={lang} />
 </Layout>
 
 <style>
