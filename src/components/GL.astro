@@ -13,8 +13,6 @@
 
   gsap.registerPlugin(ScrollTrigger);
 
-  const container = document.querySelector("sy-gl") as HTMLElement;
-
   const scene = new THREE.Scene();
   const frustumSize = 5;
   let aspect = window.innerWidth / window.innerHeight;
@@ -37,7 +35,6 @@
   const canvas = renderer.domElement;
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  container.appendChild(canvas);
 
   renderer.setClearColor("#fff");
   renderer.setClearAlpha(0);
@@ -353,8 +350,8 @@ void main() {
   }
 
   /// circle
-  const baseColor = "#fe03a2";
-  const colors = ["#FC85AE", "#8d73f5"];
+  const baseColor = "#FE3B7F";
+  const colors = ["#FF9A3C", "#FFD93C"];
 
   const seed = Math.random() * 10;
   const waves = colors.map((c, i) => {
@@ -558,7 +555,7 @@ void main() {
   ballGroup.add(circle);
 
   const mouse = new THREE.Vector2();
-  const toggled = new Set();
+  const toggled = new Set<number>();
 
   document.addEventListener("pointermove", (event) => {
     event.preventDefault();
@@ -625,133 +622,46 @@ void main() {
   let pixelToUnit = -frustumSize / window.innerHeight;
   let isPlaced = true;
 
-  // Freeze behavior for the "Фокус на результат" screen (3rd statement box)
-  // Use elementFromPoint() because the statement blocks are sticky/clipped and
-  // IntersectionObserver can be unreliable there.
-  let freezeActive = false;
-  let freezeRelY = 0;
-  let motionStarted = false;
-  let noDownAfterStarted = false;
-  let noDownRelY = 0;
-
-  const isInStartZone = () => {
-    const el = document.elementFromPoint(
-      Math.round(window.innerWidth * 0.5),
-      Math.round(window.innerHeight * 0.5),
-    ) as Element | null;
-    return !!el?.closest?.('[data-gl-start-zone="true"]');
-  };
-
-  const isPastNoDownStart = () => {
-    const el = document.querySelector<HTMLElement>("[data-gl-no-down-start]");
-    if (!el) return false;
-    const bcr = el.getBoundingClientRect();
-    // once the marked section reaches the viewport, enable the latch
-    return bcr.top <= window.innerHeight * 0.6;
-  };
-  const isInFreezeZone = () => {
-    const el = document.elementFromPoint(
-      Math.round(window.innerWidth * 0.5),
-      Math.round(window.innerHeight * 0.5),
-    ) as Element | null;
-    return !!el?.closest?.('[data-gl-freeze-zone="true"]');
-  };
-
   function animate(t: number) {
     uniforms.uTime.value = t * 1000;
 
     const vel = isPlaced ? 0 : window.scrollVelocity;
     const abs = Math.abs(vel);
-    const dir = window.scrollDirection;
+    const dir = window.scrollDirection || 1;
 
+    // Subtle rotation depending on scroll direction/speed
     panelsGroup.rotation.y += (0.002 + abs * 0.001) * dir;
     panelsGroup.rotation.x += (0.002 + abs * 0.001) * -dir;
 
     smoothVel += (abs - smoothVel) * 0.05;
     globals.uVel.value = smoothVel;
-    camera.position.y = window.scrollCurrent * pixelToUnit;
+    camera.position.y =
+      (window.scrollCurrent ?? window.scrollY ?? 0) * pixelToUnit;
 
-    // ---- Background motion (right side) ----
-    const scroll = window.scrollCurrent ?? window.scrollY ?? 0;
-    const tt = scroll * 0.0014 + t * 0.00045;
+    // ---- Stable background motion: middle of right edge ----
+    const scroll = window.scrollY || 0;
+    const tt = scroll * 0.0016 + t * 0.0006;
 
     const maxX = (frustumSize * aspect) / 2;
-    // Base position near the right edge, shifted 25px left in screen space
     const screenWidth = window.innerWidth || 1;
     const unitsPerScreenX = (frustumSize * aspect) / screenWidth;
-    const offsetUnits = 25 * unitsPerScreenX;
+    const offsetUnits = 25 * unitsPerScreenX; // keep a bit away from the edge
     const baseX = maxX * 0.8 - offsetUnits;
-    const baseRelY = 0; // center vertically
 
-    // Start movement only when entering the 2nd statement block
-    if (!motionStarted) {
-      motionStarted = isInStartZone() || isInFreezeZone();
-    }
+    const speed = Math.min(abs, 20);
+    const amp = 0.4 + 0.04 * speed;
 
-    if (!motionStarted) {
-      // Before the 2nd statements block: park the sphere on the right center.
-      ballGroup.position.x = baseX;
-      ballGroup.position.y = camera.position.y + baseRelY;
-    } else {
-      // Make motion react more strongly to scroll speed
-      const speed = Math.min(abs, 20);
-      const amp = 1 + speed * 0.06;
+    // Horizontal sway on the right side
+    const swayX =
+      Math.sin(tt * 1.4) * (0.8 * amp) +
+      Math.sin(tt * 3.1 + 1.1) * (0.3 * amp);
+    ballGroup.position.x = baseX + swayX;
 
-      // Right side of screen with chaotic wobble
-      const chaosX =
-        (Math.sin(tt * 1.7) * 0.22 +
-          Math.sin(tt * 0.9 + 1.2) * 0.14 +
-          Math.sin(tt * 3.3 + 0.4) * 0.08 +
-          Math.sin(tt * 6.1 + 2.1) * 0.04) *
-        amp;
-      ballGroup.position.x =
-        baseX + chaosX + (smoothVel * 0.003) * (window.scrollDirection || 1);
-
-      // Default: stronger vertical wobble (centered, scaled by scroll speed)
-      const chaosY =
-        (Math.cos(tt * 0.8) * 0.35 +
-          Math.sin(tt * 2.2 + 0.7) * 0.22 +
-          Math.cos(tt * 4.7 + 1.9) * 0.1) *
-        amp;
-      let relY = chaosY;
-
-      // In the "Focus on results" block: wait on scroll down; only move UP on scroll up
-      const nowFreeze = isInFreezeZone();
-      if (nowFreeze && !freezeActive) {
-        // entering freeze zone: capture current relative position
-        freezeRelY = relY;
-      }
-      freezeActive = nowFreeze;
-
-      if (freezeActive) {
-        if (window.scrollDirection === -1) {
-          // scrolling up -> move sphere up in the viewport (increase relY)
-          freezeRelY = Math.min(
-            frustumSize * 0.35,
-            freezeRelY + 0.02 + Math.min(abs * 0.008, 0.05),
-          );
-        }
-        // scrolling down -> do not move down
-        relY = freezeRelY;
-      }
-
-    // After the "5th block" marker is reached: do not allow moving DOWN anymore.
-    if (!noDownAfterStarted) {
-      noDownAfterStarted = isPastNoDownStart();
-      if (noDownAfterStarted) {
-        noDownRelY = relY;
-      }
-    }
-    if (noDownAfterStarted) {
-      // prevent downward movement on screen (relY decreasing)
-      relY = Math.max(relY, noDownRelY);
-      noDownRelY = relY;
-    }
-
-      // Place the sphere near the bottom of the screen: baseRelY pulls it down,
-      // relY adds subtle motion and any freeze/no-down adjustments.
-      ballGroup.position.y = camera.position.y + baseRelY + relY;
-    }
+    // Vertical bobbing strictly around vertical center; never sticks to top/bottom
+    const bobY =
+      Math.sin(tt) * (0.7 * amp) +
+      Math.cos(tt * 0.7 + 2.0) * (0.25 * amp);
+    ballGroup.position.y = camera.position.y + bobY;
 
     const s = ballGroup.scale.x;
     if (Number.isFinite(s) && s > 0.05) {
@@ -761,11 +671,9 @@ void main() {
 
     panelsGroup.visible = false;
     renderer.setRenderTarget(renderTarget);
-
     renderer.render(scene, camera);
     renderer.setRenderTarget(null);
     panelsGroup.visible = true;
-
     renderer.render(scene, camera);
   }
   gsap.ticker.fps(60);
@@ -827,6 +735,11 @@ void main() {
     tl: ReturnType<typeof gsap.timeline> | null = null;
 
     connectedCallback() {
+      // Always ensure the global WebGL canvas is attached to the current host.
+      if (canvas && canvas.parentElement !== this) {
+        this.appendChild(canvas);
+      }
+
       const raw = Array.from(
         document.querySelectorAll<HTMLElement>("[data-gl-place]"),
       );

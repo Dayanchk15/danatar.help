@@ -2,6 +2,9 @@ import { initReveals } from "./reveals";
 
 const PRESERVE_SCROLL = true;
 const UPDATE_URL = true;
+// For stability and performance, we use full page navigations for language switches.
+// Set to true to re-enable SPA-style language switching.
+const ENABLE_LANG_SPA = false;
 
 function replaceOrKeep<T extends Element>(
   current: T | null,
@@ -59,6 +62,7 @@ function isLangLink(el: Element | null): el is HTMLAnchorElement {
 }
 
 function onClick(e: MouseEvent) {
+  if (!ENABLE_LANG_SPA) return;
   const target = e.target as Element | null;
   const a = target?.closest("a");
   if (!isLangLink(a)) return;
@@ -75,8 +79,7 @@ function onClick(e: MouseEvent) {
 window.addEventListener("click", onClick);
 
 window.addEventListener("popstate", () => {
-  // If URL updates are disabled, there's no point in handling popstate
-  if (!UPDATE_URL) return;
+  if (!ENABLE_LANG_SPA || !UPDATE_URL) return;
   swapTo(window.location.href, false).catch(() => {});
 });
 

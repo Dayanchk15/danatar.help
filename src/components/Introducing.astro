@@ -35,7 +35,7 @@ const { title, text, cta } = Astro.props;
     z-index: 9;
     max-width: 50rem;
     margin: 0 auto;
-    padding: 1rem;
+    padding: 1.5rem;
     text-align: center;
     gap: 1rem;
     display: flex;
@@ -43,7 +43,11 @@ const { title, text, cta } = Astro.props;
     align-items: center;
     flex-direction: column;
     border-radius: 1.5rem;
-    backdrop-filter: blur(6px) saturate(1.05);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.05);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.05);
   }
 
   h2 {
