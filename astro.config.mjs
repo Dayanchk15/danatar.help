@@ -9,3 +9,7 @@ export default defineConfig({
     plugins: [tailwindcss()]
   }
 });
+
+export default defineConfig({
+  output: 'static'
+});
