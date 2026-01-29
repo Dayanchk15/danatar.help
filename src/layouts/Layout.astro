@@ -29,8 +29,21 @@ const langLinks = Object.entries(languages).map(([code, label]) => ({
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <!-- Preconnect to external resources for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://app.cal.com" />
+    
+    <!-- DNS prefetch for external resources -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="https://app.cal.com" />
+    
+    <!-- Optimize font loading -->
     <Font cssVariable="--font-roboto-slab" preload />
     <Font cssVariable="--font-inter" preload />
+    
     <title>{title}</title>
   </head>
   <body>
@@ -72,6 +85,20 @@ const langLinks = Object.entries(languages).map(([code, label]) => ({
 </style>
 
 <script>
-  import "../utils/reveals";
-  import "../utils/i18nClient";
+  // Оптимизация: загружаем скрипты асинхронно после загрузки DOM
+  (function() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadScripts);
+    } else {
+      loadScripts();
+    }
+    
+    function loadScripts() {
+      // Используем динамический импорт для code splitting
+      Promise.all([
+        import("../utils/reveals"),
+        import("../utils/i18nClient")
+      ]).catch(console.error);
+    }
+  })();
 </script>

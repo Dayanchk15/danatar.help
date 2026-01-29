@@ -124,6 +124,16 @@ const { lang } = Astro.props;
       currentOverlay = overlay;
       currentModalContent = modalContent;
       scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // На мобильных устройствах сразу показываем модальное окно без анимации
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        overlay.style.opacity = "1";
+        overlay.style.pointerEvents = "all";
+        modalContent.style.opacity = "1";
+        modalContent.style.transform = "scale(1) translateY(0)";
+      }
+      
       overlay.classList.add("active");
       document.body.style.position = "fixed";
       document.body.style.top = `-${scrollPosition}px`;
@@ -153,8 +163,11 @@ const { lang } = Astro.props;
         if (isInsideModalContent) {
           return;
         }
-        e.preventDefault();
-        e.stopPropagation();
+        // Блокируем только touchmove (скролл), не touchstart (клики)
+        if (e.type === 'touchmove') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       };
 
       scrollHandler = (e: Event) => {
@@ -179,6 +192,7 @@ const { lang } = Astro.props;
 
       overlay.addEventListener("wheel", wheelHandler, { passive: false });
       overlay.addEventListener("touchmove", touchHandler, { passive: false });
+      overlay.addEventListener("touchstart", touchHandler, { passive: true });
       window.addEventListener("scroll", scrollHandler, { passive: false });
 
       updateCalendarTexts();
@@ -238,20 +252,34 @@ const { lang } = Astro.props;
   }
 
   // Обработчики событий
-  document.addEventListener("click", (e) => {
-    const target = e.target as HTMLElement;
+  // Используем capture для мобильных устройств, чтобы события обрабатывались раньше
+  const clickHandler = (e: MouseEvent | TouchEvent) => {
+    const target = (e.target as HTMLElement) || ((e as TouchEvent).touches?.[0]?.target as HTMLElement);
+    if (!target) return;
     
     // Открытие календаря
     if (target.closest("[data-open-calendar]")) {
       e.preventDefault();
-      openCalendar();
+      e.stopPropagation();
+      // Небольшая задержка для мобильных, чтобы убедиться что событие обработано
+      if (window.innerWidth <= 768) {
+        setTimeout(() => openCalendar(), 10);
+      } else {
+        openCalendar();
+      }
+      return;
     }
     
     // Закрытие календаря
-    if (target.closest("[data-calendar-close]") || target.closest("[data-calendar-overlay]") && target === target.closest("[data-calendar-overlay]")) {
+    if (target.closest("[data-calendar-close]") || (target.closest("[data-calendar-overlay]") && target === target.closest("[data-calendar-overlay]"))) {
+      e.preventDefault();
+      e.stopPropagation();
       closeCalendar();
     }
-  });
+  };
+  
+  document.addEventListener("click", clickHandler, { capture: true });
+  document.addEventListener("touchend", clickHandler, { capture: true });
 
   // Экспортируем функции для глобального доступа
   (window as any).openCalendar = openCalendar;
@@ -271,17 +299,21 @@ const { lang } = Astro.props;
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* Для мобильных устройств */
     background: rgba(var(--rgb-brand-1), 0.4);
     backdrop-filter: blur(8px);
     z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 1rem;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s var(--ease-out-cubic);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .modal-overlay.active {
@@ -319,6 +351,33 @@ const { lang } = Astro.props;
     transform: scale(1) translateY(0);
     opacity: 1;
   }
+  
+  /* Отключаем все анимации на мобильных устройствах */
+  @media (max-width: 768px) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+      scroll-behavior: auto !important;
+    }
+    
+    .modal-overlay {
+      transition: opacity 0.01ms !important;
+    }
+    
+    .modal-content {
+      transform: scale(1) translateY(0) !important;
+      transition: none !important;
+      opacity: 1 !important;
+    }
+    
+    .modal-overlay.active .modal-content {
+      transform: scale(1) translateY(0) !important;
+    }
+  }
 
   .modal-close {
     position: absolute;
@@ -326,6 +385,8 @@ const { lang } = Astro.props;
     right: 1rem;
     width: 2.5rem;
     height: 2.5rem;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
     border: none;
     background: rgba(var(--rgb-brand-1), 0.8);
     backdrop-filter: blur(10px);
@@ -337,6 +398,7 @@ const { lang } = Astro.props;
     color: white;
     z-index: 1001;
     transition: all 0.2s var(--ease-out-cubic);
+    touch-action: manipulation; /* Улучшает отзывчивость на мобильных */
   }
 
   .modal-close:hover {
@@ -435,15 +497,36 @@ const { lang } = Astro.props;
   }
 
   @media (max-width: 640px) {
+    .modal-overlay {
+      padding: 0.5rem;
+      align-items: flex-start;
+      padding-top: 1rem;
+    }
+    
     .modal-content {
-      max-width: calc(100% - 2rem);
-      padding: 1.25rem;
-      max-height: 90vh;
+      max-width: calc(100% - 1rem);
+      width: calc(100% - 1rem);
+      padding: 1rem;
+      max-height: calc(100vh - 2rem);
+      max-height: calc(100dvh - 2rem);
+      margin: 0 auto;
+      border-radius: 1rem;
     }
     
     .modal-content.has-calendar {
-      max-width: calc(100% - 2rem);
+      max-width: calc(100% - 1rem);
+      width: calc(100% - 1rem);
       padding-top: 0.5rem;
+      padding-bottom: 1rem;
+    }
+    
+    .modal-close {
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 2rem;
+      height: 2rem;
+      min-width: 2rem;
+      min-height: 2rem;
     }
 
     .cal-container {
@@ -459,20 +542,66 @@ const { lang } = Astro.props;
     }
     
     .cal-wrapper {
-      min-height: 450px;
-      max-height: 450px;
+      min-height: 400px;
+      max-height: 400px;
       margin-top: 0.1rem;
     }
     
     #cal-com-embed {
-      min-height: 450px;
-      max-height: 450px;
+      min-height: 400px;
+      max-height: 400px;
     }
     
     .cal-iframe {
-      height: 450px !important;
-      min-height: 450px !important;
-      max-height: 450px !important;
+      height: 400px !important;
+      min-height: 400px !important;
+      max-height: 400px !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .modal-overlay {
+      padding: 0.25rem;
+      padding-top: 0.5rem;
+    }
+    
+    .modal-content {
+      max-width: calc(100% - 0.5rem);
+      width: calc(100% - 0.5rem);
+      padding: 0.875rem;
+      max-height: calc(100vh - 1rem);
+      max-height: calc(100dvh - 1rem);
+      border-radius: 0.75rem;
+    }
+    
+    .modal-content.has-calendar {
+      max-width: calc(100% - 0.5rem);
+      width: calc(100% - 0.5rem);
+    }
+    
+    .modal-close {
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      min-width: 1.75rem;
+      min-height: 1.75rem;
+    }
+    
+    .cal-wrapper {
+      min-height: 350px;
+      max-height: 350px;
+    }
+    
+    #cal-com-embed {
+      min-height: 350px;
+      max-height: 350px;
+    }
+    
+    .cal-iframe {
+      height: 350px !important;
+      min-height: 350px !important;
+      max-height: 350px !important;
     }
   }
 </style>

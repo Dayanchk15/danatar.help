@@ -43,16 +43,8 @@ const isLowEndDevice =
   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
   (window.innerWidth < 1024);
 
-// Снижаем FPS на слабых устройствах
-if (isLowEndDevice) {
-  // Определяем производительность устройства
-const isLowEndDevice = 
-  (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
-  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-  window.innerWidth < 1024;
-
-gsap.ticker.fps(isLowEndDevice ? 24 : 30); // Еще ниже FPS на слабых устройствах
-}
+// Снижаем FPS на слабых устройствах для лучшей производительности
+gsap.ticker.fps(isLowEndDevice ? 24 : 30);
 
 gsap.ticker.lagSmoothing(0);
 

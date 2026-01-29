@@ -82,10 +82,11 @@ function onVisibilityChange(entries: IntersectionObserverEntry[]) {
   })
 }
 
+// Оптимизация IntersectionObserver для производительности
 const observer = new IntersectionObserver(onVisibilityChange, {
   root: null,
-  rootMargin: '10px 0px',
-  threshold: 0,
+  rootMargin: '50px 0px', // Предзагрузка за 50px до появления
+  threshold: [0, 0.1], // Несколько порогов для более плавной анимации
 })
 
 export function addIntersectingObserver(el: VisibilityChangeElement) {

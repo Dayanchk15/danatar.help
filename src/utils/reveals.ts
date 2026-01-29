@@ -2,10 +2,11 @@ import { addGlobalTicker } from "./globalTicker";
 import gsap from "gsap";
 import SplitText from "gsap/SplitText";
 
+// Оптимизация IntersectionObserver для производительности
 const observer = new IntersectionObserver(intersectCallback, {
   root: null,
-  rootMargin: '0px 0px',
-  threshold: 0,
+  rootMargin: '50px 0px', // Предзагрузка за 50px до появления
+  threshold: [0, 0.1, 0.5], // Несколько порогов для более плавной анимации
 })
 
 const map = new WeakMap<HTMLElement, ((entries: IntersectionObserverEntry) => void)[]>();

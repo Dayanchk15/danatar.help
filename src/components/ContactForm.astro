@@ -125,6 +125,15 @@ const { lang } = Astro.props;
       // Сохраняем текущую позицию скролла
       scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
       
+      // На мобильных устройствах сразу показываем модальное окно без анимации
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        overlay.style.opacity = "1";
+        overlay.style.pointerEvents = "all";
+        modalContent.style.opacity = "1";
+        modalContent.style.transform = "scale(1) translateY(0)";
+      }
+      
       overlay.classList.add("active");
       
       // Фиксируем позицию и отключаем скролл
@@ -158,16 +167,23 @@ const { lang } = Astro.props;
       
       // Обработчик для touch событий
       touchHandler = (e: TouchEvent) => {
-        const target = e.target as HTMLElement;
+        const path = e.composedPath();
+        const isInsideModalContent = path.some((node) => {
+          const el = node as HTMLElement;
+          return el === modalContent || (el.nodeType === 1 && modalContent.contains(el));
+        });
         
         // Если событие происходит внутри модального окна - разрешаем
-        if (modalContent.contains(target) || overlay.contains(target)) {
+        if (isInsideModalContent) {
           return;
         }
         
-        // Блокируем для всего остального
-        e.preventDefault();
-        e.stopPropagation();
+        // Блокируем для всего остального только если это touchmove (скролл)
+        // Не блокируем touchstart, чтобы не мешать кликам
+        if (e.type === 'touchmove') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       };
       
       // Обработчик для scroll событий (дополнительная защита)
@@ -196,6 +212,7 @@ const { lang } = Astro.props;
       // Обработчик будет проверять путь события и разрешать скролл внутри модального окна
       overlay.addEventListener("wheel", wheelHandler, { passive: false });
       overlay.addEventListener("touchmove", touchHandler, { passive: false });
+      overlay.addEventListener("touchstart", touchHandler, { passive: true });
       
       // Обработчик scroll на window для блокировки скролла основного сайта
       window.addEventListener("scroll", scrollHandler, { passive: false });
@@ -247,14 +264,26 @@ const { lang } = Astro.props;
   }
   
   // Open form when clicking "Написать" button
-  document.addEventListener("click", (e) => {
-    const target = e.target as HTMLElement;
+  // Используем capture для мобильных устройств, чтобы события обрабатывались раньше
+  const clickHandler = (e: MouseEvent | TouchEvent) => {
+    const target = (e.target as HTMLElement) || ((e as TouchEvent).touches?.[0]?.target as HTMLElement);
+    if (!target) return;
+    
     const link = target.closest(".contact-cta");
     if (link) {
       e.preventDefault();
-      openForm();
+      e.stopPropagation();
+      // Небольшая задержка для мобильных, чтобы убедиться что событие обработано
+      if (window.innerWidth <= 768) {
+        setTimeout(() => openForm(), 10);
+      } else {
+        openForm();
+      }
     }
-  });
+  };
+  
+  document.addEventListener("click", clickHandler, { capture: true });
+  document.addEventListener("touchend", clickHandler, { capture: true });
   
   // Close form handlers
   document.addEventListener("click", (e) => {
@@ -306,6 +335,9 @@ const { lang } = Astro.props;
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* Для мобильных устройств */
     background: rgba(var(--rgb-brand-1), 0.25);
     backdrop-filter: blur(12px);
     z-index: 1000;
@@ -316,6 +348,8 @@ const { lang } = Astro.props;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s var(--ease-out-cubic);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .modal-overlay.active {
@@ -366,12 +400,41 @@ const { lang } = Astro.props;
     opacity: 1;
   }
   
+  /* Отключаем все анимации на мобильных устройствах */
+  @media (max-width: 768px) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+      scroll-behavior: auto !important;
+    }
+    
+    .modal-overlay {
+      transition: opacity 0.01ms !important;
+    }
+    
+    .modal-content {
+      transform: scale(1) translateY(0) !important;
+      transition: none !important;
+      opacity: 1 !important;
+    }
+    
+    .modal-overlay.active .modal-content {
+      transform: scale(1) translateY(0) !important;
+    }
+  }
+  
   .modal-close {
     position: absolute;
     top: 1rem;
     right: 1rem;
     width: 2.5rem;
     height: 2.5rem;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
     border: none;
     background: rgba(var(--rgb-brand-1), 0.8);
     backdrop-filter: blur(10px);
@@ -384,6 +447,8 @@ const { lang } = Astro.props;
     border: 1px solid rgba(var(--rgb-white), 0.3);
     transition: background 0.2s var(--ease-out-cubic), transform 0.2s var(--ease-out-cubic), box-shadow 0.2s var(--ease-out-cubic);
     box-shadow: 0 4px 12px rgba(var(--rgb-brand-1), 0.3);
+    z-index: 1001;
+    touch-action: manipulation; /* Улучшает отзывчивость на мобильных */
   }
   
   .modal-close:hover {
@@ -620,10 +685,29 @@ const { lang } = Astro.props;
 
 
   @media (max-width: 640px) {
+    .modal-overlay {
+      padding: 0.5rem;
+      align-items: flex-start;
+      padding-top: 1rem;
+    }
+    
     .modal-content {
-      max-width: calc(100% - 2rem);
-      padding: 1.25rem;
-      max-height: 90vh;
+      max-width: calc(100% - 1rem);
+      width: calc(100% - 1rem);
+      padding: 1rem;
+      max-height: calc(100vh - 2rem);
+      max-height: calc(100dvh - 2rem);
+      margin: 0 auto;
+      border-radius: 1rem;
+    }
+    
+    .modal-close {
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 2rem;
+      height: 2rem;
+      min-width: 2rem;
+      min-height: 2rem;
     }
     
     .form-title {
@@ -649,6 +733,31 @@ const { lang } = Astro.props;
       padding: 0 !important;
       font-size: var(--font-size-md) !important;
       font-weight: 900 !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .modal-overlay {
+      padding: 0.25rem;
+      padding-top: 0.5rem;
+    }
+    
+    .modal-content {
+      max-width: calc(100% - 0.5rem);
+      width: calc(100% - 0.5rem);
+      padding: 0.875rem;
+      max-height: calc(100vh - 1rem);
+      max-height: calc(100dvh - 1rem);
+      border-radius: 0.75rem;
+    }
+    
+    .modal-close {
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      min-width: 1.75rem;
+      min-height: 1.75rem;
     }
   }
 </style>

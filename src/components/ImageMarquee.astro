@@ -12,9 +12,9 @@ const { images, direction } = Astro.props;
 <sy-image-marquee data-dir={direction}>
   <div class="inner">
     {
-      images.map((img) => (
+      images.map((img, index) => (
         <div class="img">
-          <img {...img} />
+          <img {...img} loading="lazy" decoding="async" />
         </div>
       ))
     }
@@ -49,13 +49,17 @@ const { images, direction } = Astro.props;
     grid-row: 1;
     grid-column: 1;
     transform: translateZ(0);
-    will-change: transform;
     width: 6rem;
     height: 3rem;
 
     @media (--mq-tablet-sm) {
       width: 10.9375rem;
       height: 5.5625rem;
+    }
+    
+    /* Включаем will-change только на мощных устройствах */
+    @media (min-width: 1024px) and (min-resolution: 2dppx) {
+      will-change: transform;
     }
 
     img {

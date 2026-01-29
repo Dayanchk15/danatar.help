@@ -13,9 +13,9 @@ const { images, class: className } = Astro.props;
   <div class="outer">
     <div class="inner">
       {
-        images.map((img) => (
+        images.map((img, index) => (
           <div class="img">
-            <img {...img} />
+            <img {...img} loading={index === 0 ? "eager" : "lazy"} decoding="async" />
           </div>
         ))
       }
