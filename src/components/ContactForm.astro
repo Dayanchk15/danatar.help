@@ -56,6 +56,8 @@ const { lang } = Astro.props;
 </sy-contact-form>
 
 <script>
+  console.log("ContactForm script loaded");
+  
   import { useTranslations } from "../i18n/utils";
   
   const lang = (document.documentElement.lang || "ru") as keyof typeof import("../i18n/ui").languages;
@@ -117,8 +119,10 @@ const { lang } = Astro.props;
 
 
   function openForm() {
+    console.log("openForm called");
     const overlay = document.querySelector<HTMLElement>("[data-form-overlay]");
     const modalContent = document.querySelector<HTMLElement>(".modal-content");
+    console.log("Overlay:", overlay, "ModalContent:", modalContent);
     if (overlay && modalContent) {
       currentOverlay = overlay;
       currentModalContent = modalContent;
@@ -263,27 +267,86 @@ const { lang } = Astro.props;
     }
   }
   
-  // Open form when clicking "Написать" button
-  // Используем capture для мобильных устройств, чтобы события обрабатывались раньше
-  const clickHandler = (e: MouseEvent | TouchEvent) => {
-    const target = (e.target as HTMLElement) || ((e as TouchEvent).touches?.[0]?.target as HTMLElement);
-    if (!target) return;
-    
-    const link = target.closest(".contact-cta");
-    if (link) {
+  // Максимально простое и надежное решение
+  function setupContactButton() {
+    const button = document.querySelector(".contact-cta") as HTMLButtonElement;
+    if (button && !button.dataset.handlerAttached) {
+      console.log("Setting up contact button handler");
+      button.dataset.handlerAttached = "true";
+      button.onclick = (e) => {
+        console.log("Button clicked via onclick");
+        e.preventDefault();
+        e.stopPropagation();
+        openForm();
+        return false;
+      };
+    }
+  }
+  
+  // Делегирование событий на весь document
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (target && (target.classList.contains("contact-cta") || target.closest(".contact-cta"))) {
+      console.log("Button clicked via delegation");
       e.preventDefault();
       e.stopPropagation();
-      // Небольшая задержка для мобильных, чтобы убедиться что событие обработано
-      if (window.innerWidth <= 768) {
-        setTimeout(() => openForm(), 10);
-      } else {
-        openForm();
-      }
+      openForm();
     }
-  };
+  }, true);
   
-  document.addEventListener("click", clickHandler, { capture: true });
-  document.addEventListener("touchend", clickHandler, { capture: true });
+  // Инициализация
+  function initContactForm() {
+    console.log("Initializing contact form handlers");
+    setupContactButton();
+  }
+  
+  console.log("ContactForm script executing, readyState:", document.readyState);
+  
+  // Множественная инициализация для надежности
+  if (document.readyState === 'loading') {
+    console.log("DOM is loading, waiting for DOMContentLoaded");
+    document.addEventListener('DOMContentLoaded', initContactForm);
+  } else {
+    console.log("DOM already loaded, initializing now");
+    initContactForm();
+  }
+  
+  // Повторные попытки
+  setTimeout(() => { console.log("Retry 1 (50ms)"); initContactForm(); }, 50);
+  setTimeout(() => { console.log("Retry 2 (200ms)"); initContactForm(); }, 200);
+  setTimeout(() => { console.log("Retry 3 (500ms)"); initContactForm(); }, 500);
+  setTimeout(() => { console.log("Retry 4 (1000ms)"); initContactForm(); }, 1000);
+  
+  window.addEventListener('load', () => {
+    console.log("Window loaded, final initialization");
+    initContactForm();
+  });
+  
+  // MutationObserver для отслеживания появления кнопки
+  const observer = new MutationObserver(() => {
+    setupContactButton();
+  });
+  
+  if (document.body) {
+    console.log("Setting up MutationObserver on body");
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  } else {
+    console.log("Body not ready, waiting for DOMContentLoaded");
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log("Body ready, setting up MutationObserver");
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    });
+  }
+  
+  // Глобальная функция
+  (window as any).openContactForm = openForm;
+  console.log("ContactForm setup complete, openContactForm available:", typeof (window as any).openContactForm);
   
   // Close form handlers
   document.addEventListener("click", (e) => {

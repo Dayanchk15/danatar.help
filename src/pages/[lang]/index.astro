@@ -29,6 +29,7 @@ const t = useTranslations(lang);
 
 <Layout title={t("meta.title.home")}>
   <HeroHome
+    client:load
     title={t("hero.title")}
     subtitle={t("hero.subtitle")}
     cta={{
@@ -39,6 +40,7 @@ const t = useTranslations(lang);
 
   <section id="intro">
     <Introducing
+      client:visible
       title={t("intro.title")}
       text={t("intro.text")}
       cta={{
@@ -50,6 +52,7 @@ const t = useTranslations(lang);
 
   <Services
     id="services"
+    client:visible
     title={t("services.title")}
     subtitle={t("services.subtitle")}
     categories={[
@@ -126,6 +129,7 @@ const t = useTranslations(lang);
   />
 
   <StepsTimeline
+    client:visible
     title={t("steps.title")}
     items={[
       { title: t("steps.1.title"), text: t("steps.1.text") },
@@ -136,6 +140,7 @@ const t = useTranslations(lang);
 
   <section data-gl-no-down-start="true">
     <GalleryText
+      client:visible
       title={t("gallery.title")}
       text={t("gallery.text")}
       cta={{
@@ -152,6 +157,7 @@ const t = useTranslations(lang);
   </section>
 
   <Statements
+    client:visible
     items={[
       { title: t("statements.1.title"), text: t("statements.1.text") },
       { title: t("statements.2.title"), text: t("statements.2.text") },
@@ -171,6 +177,7 @@ const t = useTranslations(lang);
   </section>
 
   <Faqs
+    client:visible
     title={t("faqs.title")}
     mobileTitle={t("faqs.mobileTitle")}
     subtitle={t("faqs.subtitle")}
@@ -192,6 +199,7 @@ const t = useTranslations(lang);
   </section>
 
   <TextMarquee
+    client:visible
     class="marquee"
     texts={[
       t("services.items.webDesign.title"),
@@ -207,10 +215,10 @@ const t = useTranslations(lang);
     ]}
   />
 
-  <GL />
-  <GLPlaces />
-  <ContactForm lang={lang} />
-  <CalendarModal lang={lang} />
+  <GL client:idle />
+  <GLPlaces client:idle />
+  <ContactForm client:load lang={lang} />
+  <CalendarModal client:load lang={lang} />
 </Layout>
 
 <style>

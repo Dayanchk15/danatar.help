@@ -49,6 +49,7 @@ const langLinks = Object.entries(languages).map(([code, label]) => ({
   <body>
     <a href="#main" class="skip-link">{t("accessibility.skip-to-content")}</a>
     <Header
+      client:load
       logoUrl={`/${lang}/`}
       logoAlt="Danny"
       links={links}
@@ -59,8 +60,8 @@ const langLinks = Object.entries(languages).map(([code, label]) => ({
     <main id="main">
       <slot />
     </main>
-    <Footer logoUrl={`/${lang}/`} logoAlt="Danny" links={links} />
-    <SmoothScroll />
+    <Footer client:visible logoUrl={`/${lang}/`} logoAlt="Danny" links={links} />
+    <SmoothScroll client:load />
   </body>
 </html>
 
@@ -85,20 +86,34 @@ const langLinks = Object.entries(languages).map(([code, label]) => ({
 </style>
 
 <script>
-  // Оптимизация: загружаем скрипты асинхронно после загрузки DOM
+  // Оптимизация: загружаем скрипты после полной загрузки страницы
   (function() {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadScripts);
-    } else {
+    // Ждем полной загрузки страницы перед загрузкой некритичных скриптов
+    if (document.readyState === 'complete') {
       loadScripts();
+    } else {
+      window.addEventListener('load', loadScripts, { once: true });
     }
     
     function loadScripts() {
-      // Используем динамический импорт для code splitting
-      Promise.all([
-        import("../utils/reveals"),
-        import("../utils/i18nClient")
-      ]).catch(console.error);
+      // Используем requestIdleCallback для загрузки некритичных скриптов
+      // когда браузер свободен
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+          Promise.all([
+            import("../utils/reveals"),
+            import("../utils/i18nClient")
+          ]).catch(console.error);
+        }, { timeout: 2000 });
+      } else {
+        // Fallback для браузеров без requestIdleCallback
+        setTimeout(() => {
+          Promise.all([
+            import("../utils/reveals"),
+            import("../utils/i18nClient")
+          ]).catch(console.error);
+        }, 100);
+      }
     }
   })();
 </script>

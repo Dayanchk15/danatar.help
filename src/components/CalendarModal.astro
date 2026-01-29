@@ -20,10 +20,10 @@ const { lang } = Astro.props;
         <h2 class="u-heading form-title" data-lang-key="form.calendar.title">Записаться на встречу</h2>
         <p class="u-text form-subtitle" data-lang-key="form.calendar.subtitle">Выберите удобное время</p>
         <div class="cal-wrapper">
-          <div id="cal-com-embed" data-cal-username="dayanch-kakamyradov-vm0qss"></div>
+          <div id="cal-com-embed" data-cal-username="dany-danatarow-uioayz"></div>
           <iframe 
             id="cal-iframe-fallback"
-            src="https://app.cal.com/dayanch-kakamyradov-vm0qss" 
+            src="https://app.cal.com/dany-danatarow-uioayz" 
             class="cal-iframe"
             frameborder="0"
             allow="camera; microphone; geolocation"
@@ -86,7 +86,7 @@ const { lang } = Astro.props;
       return;
     }
     
-    const calUsername = calContainer?.getAttribute("data-cal-username") || "dayanch-kakamyradov-vm0qss";
+    const calUsername = calContainer?.getAttribute("data-cal-username") || "dany-danatarow-uioayz";
     const iframeUrl = `https://app.cal.com/${calUsername}`;
     
     // Устанавливаем src iframe
