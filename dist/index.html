@@ -1,4 +1,19 @@
-<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/ru/"><title>Danny</title></head> <body> <p>
-Redirecting to <a href="/ru/">/ru/</a>...
-</p>
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><title>Danny</title><script>(function(){const defaultLang = "ru";
+
+      // Мгновенный редирект без видимого сообщения
+      (function() {
+        const currentPath = window.location.pathname;
+        
+        // Проверяем, не находимся ли мы уже на языковой версии
+        if (!currentPath.startsWith(`/${defaultLang}/`) && currentPath !== `/${defaultLang}`) {
+          // Определяем язык из браузера или используем дефолтный
+          const browserLang = navigator.language.split('-')[0];
+          const supportedLangs = ['ru', 'en', 'tk'];
+          const lang = supportedLangs.includes(browserLang) ? browserLang : defaultLang;
+          
+          // Мгновенный редирект
+          window.location.replace(`/${lang}/`);
+        }
+      })();
+    })();</script></head> <body style="margin:0;padding:0;background:transparent;"> <!-- Пустое тело для мгновенного редиректа -->
 ---</body></html>

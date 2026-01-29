@@ -2,6 +2,7 @@ export interface Link {
   title: string;
   url: string;
   target?: string;
+  dataAction?: string;
 }
 
 export interface Image {

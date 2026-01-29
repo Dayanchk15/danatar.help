@@ -16,37 +16,41 @@ const { lang } = Astro.props;
         </svg>
       </button>
       
-      <form class="contact-form" data-contact-form>
-        <h2 class="u-heading form-title" data-lang-key="form.title"></h2>
-        <p class="u-text form-subtitle" data-lang-key="form.subtitle"></p>
-        
-        <div class="form-group">
-          <label for="name" class="u-text" data-lang-key="form.name"></label>
-          <input type="text" id="name" name="name" required class="u-text" />
-        </div>
-        
-        <div class="form-group">
-          <label for="email" class="u-text" data-lang-key="form.email"></label>
-          <input type="email" id="email" name="email" required class="u-text" />
-        </div>
-        
-        <div class="form-group">
-          <label for="phone" class="u-text" data-lang-key="form.phone"></label>
-          <input type="tel" id="phone" name="phone" class="u-text" />
-        </div>
-        
-        <div class="form-group">
-          <label for="message" class="u-text" data-lang-key="form.message"></label>
-          <textarea id="message" name="message" rows="5" required class="u-text"></textarea>
-        </div>
-        
-        <button type="submit" class="btn btn-primary u-text" data-lang-key="form.submit">
-          <span>
-            <span data-lang-text="form.submit"></span>
-            <span aria-hidden data-lang-text="form.submit"></span>
-          </span>
-        </button>
-      </form>
+      <!-- Форма контакта -->
+      <div>
+        <form class="contact-form" data-contact-form>
+          <h2 class="u-heading form-title" data-lang-key="form.title"></h2>
+          <p class="u-text form-subtitle" data-lang-key="form.subtitle"></p>
+          
+          <div class="form-group">
+            <label for="name" class="u-text" data-lang-key="form.name"></label>
+            <input type="text" id="name" name="name" required class="u-text" />
+          </div>
+          
+          <div class="form-group">
+            <label for="email" class="u-text" data-lang-key="form.email"></label>
+            <input type="email" id="email" name="email" required class="u-text" />
+          </div>
+          
+          <div class="form-group">
+            <label for="phone" class="u-text" data-lang-key="form.phone"></label>
+            <input type="tel" id="phone" name="phone" class="u-text" />
+          </div>
+          
+          <div class="form-group">
+            <label for="message" class="u-text" data-lang-key="form.message"></label>
+            <textarea id="message" name="message" rows="5" required class="u-text"></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary u-text" data-lang-key="form.submit">
+            <span>
+              <span data-lang-text="form.submit"></span>
+              <span aria-hidden data-lang-text="form.submit"></span>
+            </span>
+          </button>
+        </form>
+      </div>
+      
     </div>
   </div>
 </sy-contact-form>
@@ -110,6 +114,7 @@ const { lang } = Astro.props;
   let modalWheelHandler: ((e: WheelEvent) => void) | null = null;
   let currentOverlay: HTMLElement | null = null;
   let currentModalContent: HTMLElement | null = null;
+
 
   function openForm() {
     const overlay = document.querySelector<HTMLElement>("[data-form-overlay]");
@@ -201,8 +206,10 @@ const { lang } = Astro.props;
   
   function closeForm() {
     const overlay = currentOverlay || document.querySelector<HTMLElement>("[data-form-overlay]");
+    const modalContent = document.querySelector<HTMLElement>(".modal-content");
     if (overlay) {
       overlay.classList.remove("active");
+      
       
       // Удаляем обработчики с overlay
       if (wheelHandler && overlay) {
@@ -330,9 +337,10 @@ const { lang } = Astro.props;
     overflow-x: hidden;
     box-shadow: 0 20px 60px rgba(var(--rgb-brand-1), 0.2), 0 0 0 1px rgba(var(--rgb-brand-1), 0.1);
     transform: scale(0.95) translateY(1rem);
-    transition: transform 0.3s var(--ease-out-cubic), opacity 0.3s var(--ease-out-cubic);
+    transition: transform 0.3s var(--ease-out-cubic), opacity 0.3s var(--ease-out-cubic), max-width 0.3s var(--ease-out-cubic);
     opacity: 0;
   }
+  
   
   /* Кастомный скроллбар для модального окна */
   .modal-content::-webkit-scrollbar {
@@ -450,34 +458,67 @@ const { lang } = Astro.props;
   }
   
   .contact-form .btn {
-    --fs: var(--font-size-xs);
-    --fw: 600;
+    --fs: var(--font-size-lg);
+    --fw: 900;
     --text-color: var(--color-white);
     --bg-color: var(--color-brand-1);
-    --hover-bg-color: var(--color-white);
-    --hover-text-color: var(--color-brand-1);
+    --hover-bg-color: var(--color-brand-5);
+    --hover-text-color: var(--color-white);
     
-    margin-top: 0.25rem;
-    align-self: flex-start;
+    margin-top: 0.5rem;
+    align-self: center;
+    width: 250px;
+    height: 55px;
     cursor: pointer;
     padding: 0;
     border: none;
-    background: var(--bg-color);
-    letter-spacing: 0.02em;
-    display: inline-block;
+    background: linear-gradient(135deg, var(--color-brand-1) 0%, rgba(var(--rgb-brand-1), 0.9) 50%, var(--color-brand-5) 100%);
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     overflow: hidden;
     border-radius: 100px;
-    box-shadow: 0 4px 12px rgba(var(--rgb-brand-1), 0.3);
-    transition: box-shadow 0.2s var(--ease-out-cubic);
+    box-shadow: 0 6px 20px rgba(var(--rgb-brand-1), 0.4), 
+                0 2px 8px rgba(var(--rgb-brand-1), 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.3s var(--ease-out-cubic);
+    transform: translateY(0);
+  }
+  
+  .contact-form .btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s var(--ease-out-cubic);
   }
   
   .contact-form .btn:hover {
-    box-shadow: 0 6px 16px rgba(var(--rgb-brand-1), 0.4);
+    box-shadow: 0 8px 28px rgba(var(--rgb-brand-1), 0.5), 
+                0 4px 12px rgba(var(--rgb-brand-5), 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--color-brand-5) 0%, var(--color-brand-1) 50%, rgba(var(--rgb-brand-1), 0.9) 100%);
+  }
+  
+  .contact-form .btn:hover::before {
+    left: 100%;
+  }
+  
+  .contact-form .btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 16px rgba(var(--rgb-brand-1), 0.4);
   }
   
   .contact-form .btn > span {
     display: block;
+    position: relative;
+    z-index: 1;
   }
   
   .contact-form .btn > span:after {
@@ -488,33 +529,95 @@ const { lang } = Astro.props;
     width: 100%;
     height: 100%;
     border-radius: 99px;
-    border: 2px solid var(--bg-color);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     z-index: 2;
+    pointer-events: none;
   }
   
-  .contact-form .btn > span > span {
-    color: var(--text-color);
+  /* Переопределяем стили для кнопки с классом u-text */
+  .contact-form .btn.u-text,
+  .contact-form button.btn.u-text {
+    color: rgb(255, 255, 255) !important;
+    font-weight: 900 !important;
+  }
+  
+  .contact-form .btn > span {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .contact-form .btn > span > span,
+  .contact-form .btn.u-text > span > span,
+  .contact-form button.btn.u-text > span > span {
+    color: rgb(255, 255, 255) !important;
     position: relative;
     display: flex;
     align-items: center;
-    padding: 0.875em 1.375em;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0 !important;
+    width: 100%;
+    height: 100%;
     line-height: 1.25;
-    background: var(--bg-color);
+    background: transparent;
+    font-weight: 900 !important;
+    font-size: var(--font-size-lg) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
   }
   
-  .contact-form .btn > span > span:first-child {
-    transition: clip-path 0.25s var(--ease-out-cubic);
-    color: var(--hover-text-color);
-    background: var(--hover-bg-color);
+  .contact-form .btn > span > span:first-child,
+  .contact-form .btn.u-text > span > span:first-child,
+  .contact-form button.btn.u-text > span > span:first-child {
+    transition: clip-path 0.3s var(--ease-out-cubic);
+    color: rgb(255, 255, 255) !important;
+    background: transparent;
+    font-weight: 900 !important;
+    padding: 0 !important;
+    width: 100%;
+    height: 100%;
     z-index: 2;
     position: absolute;
     clip-path: inset(50% round 99px);
+  }
+  
+  .contact-form .btn > span > span:last-child,
+  .contact-form .btn.u-text > span > span:last-child,
+  .contact-form button.btn.u-text > span > span:last-child {
+    color: rgb(255, 255, 255) !important;
+    font-weight: 900 !important;
+    padding: 0 !important;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Принудительно переопределяем все вложенные элементы */
+  .contact-form .btn.u-text *,
+  .contact-form button.btn.u-text * {
+    color: rgb(255, 255, 255) !important;
+    font-weight: 900 !important;
   }
   
   .contact-form .btn:hover > span > span:first-child,
   .contact-form .btn:focus > span > span:first-child {
     clip-path: inset(-100% 0 round 99px);
   }
+  
+  /* Добавляем иконку стрелки при наведении */
+  .contact-form .btn > span > span:first-child::after {
+    content: "→";
+    margin-left: 0.5rem;
+    display: inline-block;
+    transition: transform 0.3s var(--ease-out-cubic);
+  }
+  
+  .contact-form .btn:hover > span > span:first-child::after {
+    transform: translateX(4px);
+  }
+
 
   @media (max-width: 640px) {
     .modal-content {
@@ -522,7 +625,7 @@ const { lang } = Astro.props;
       padding: 1.25rem;
       max-height: 90vh;
     }
-
+    
     .form-title {
       --fs: 1.75rem;
     }
@@ -533,6 +636,19 @@ const { lang } = Astro.props;
 
     .form-group textarea {
       min-height: 70px;
+    }
+    
+    .contact-form .btn {
+      width: 100%;
+      max-width: 250px;
+      height: 55px;
+      --fs: var(--font-size-md);
+    }
+    
+    .contact-form .btn > span > span {
+      padding: 0 !important;
+      font-size: var(--font-size-md) !important;
+      font-weight: 900 !important;
     }
   }
 </style>

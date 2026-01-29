@@ -6,14 +6,22 @@
 
 <script>
   import * as THREE from "three";
-
   import gsap from "gsap";
   import { addResizeObserver } from "../utils/observers";
   import ScrollTrigger from "gsap/ScrollTrigger";
 
   gsap.registerPlugin(ScrollTrigger);
 
-  const scene = new THREE.Scene();
+  // Проверка на мобильные устройства и слабые устройства - отключаем 3D шар для производительности
+  const isMobile = window.innerWidth < 768;
+  const isLowEndDevice = 
+    (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    window.innerWidth < 1024;
+  
+  // Полностью отключаем 3D шар на слабых устройствах и мобильных
+  if (!isMobile && !isLowEndDevice) {
+    const scene = new THREE.Scene();
   const frustumSize = 5;
   let aspect = window.innerWidth / window.innerHeight;
   const camera = new THREE.OrthographicCamera(
@@ -33,7 +41,8 @@
     antialias: true,
   });
   const canvas = renderer.domElement;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  // Снижаем pixel ratio для лучшей производительности
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   renderer.setClearColor("#fff");
@@ -579,7 +588,8 @@ void main() {
   });
 
   // Use sphere geometry instead of plane for 3D volumetric effect
-  const geometry = new THREE.SphereGeometry(0.85, 64, 64);
+  // Снижаем детализацию для лучшей производительности
+  const geometry = new THREE.SphereGeometry(0.85, SIMPLIFY_ANIMATIONS ? 32 : 48, SIMPLIFY_ANIMATIONS ? 32 : 48);
   const circle = new THREE.Mesh(geometry, material);
   // Ensure circle is always visible and rendered properly, regardless of rotation
   circle.renderOrder = 1; // Render after panels
@@ -765,19 +775,52 @@ void main() {
     renderer.render(scene, camera);
   }
 
-  // Always enable animation, but use lower FPS on mobile for performance
-  const targetFPS = SIMPLIFY_ANIMATIONS ? 30 : 45;
-  gsap.ticker.fps(targetFPS);
-  gsap.ticker.add(animate);
-
-  // Pause animation when tab is hidden to save CPU/GPU
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      gsap.ticker.remove(animate);
-    } else {
-      gsap.ticker.add(animate);
+  // Полностью отключаем 3D шар на слабых устройствах для производительности
+  // Используем уже определенную isLowEndDevice из начала файла
+  if (isLowEndDevice || isMobile) {
+    // Создаем пустой компонент вместо 3D сцены
+    class SyGL extends HTMLElement {
+      connectedCallback() {
+        // Ничего не делаем на слабых устройствах
+      }
     }
-  });
+    customElements.define("sy-gl", SyGL);
+  } else {
+    // Снижаем FPS для лучшей производительности
+    const targetFPS = SIMPLIFY_ANIMATIONS ? 24 : 30; // Еще больше снижено
+    gsap.ticker.fps(targetFPS);
+    
+    // Оптимизация: пропускаем кадры если производительность низкая
+    let frameSkip = 0;
+    let lastFrameTime = 0;
+    const minFrameTime = 1000 / targetFPS; // Минимальное время между кадрами
+    
+    // Обертка для animate с пропуском кадров и throttling
+    const optimizedAnimate = (t: number) => {
+      const now = performance.now();
+      const deltaTime = now - lastFrameTime;
+      
+      // Пропускаем кадры если прошло недостаточно времени
+      if (deltaTime < minFrameTime) {
+        return;
+      }
+      
+      // Пропускаем каждый второй кадр на слабых устройствах
+      if (SIMPLIFY_ANIMATIONS) {
+        frameSkip++;
+        if (frameSkip % 2 === 0) {
+          return;
+        }
+      }
+      
+      lastFrameTime = now;
+      animate(t);
+    };
+    
+    gsap.ticker.remove(animate);
+    gsap.ticker.add(optimizedAnimate);
+  }
+  
 
   const alphas: unknown[] = [];
   const displaces: unknown[] = [];
@@ -992,8 +1035,14 @@ void main() {
 
       this.tl = tl;
 
+      // Throttle ScrollTrigger refresh для производительности
+      let refreshTimeout: number | null = null;
       const resizeObserver = new ResizeObserver(() => {
-        tl.scrollTrigger?.refresh();
+        if (refreshTimeout) return;
+        refreshTimeout = requestAnimationFrame(() => {
+          tl.scrollTrigger?.refresh();
+          refreshTimeout = null;
+        });
       });
       resizeObserver.observe(document.body);
     }
@@ -1015,7 +1064,8 @@ void main() {
 
       pixelToUnit = -frustumSize / height;
 
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      // Снижаем pixel ratio для лучшей производительности
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
       renderer.setSize(width, height);
 
       globals.uResolution.value.x = canvas.width;
@@ -1052,7 +1102,16 @@ void main() {
     }
   }
 
-  customElements.define("sy-gl", SyGL);
+    customElements.define("sy-gl", SyGL);
+  } else {
+    // На мобильных устройствах создаем пустой компонент
+    class SyGL extends HTMLElement {
+      connectedCallback() {
+        // Ничего не делаем на мобильных устройствах
+      }
+    }
+    customElements.define("sy-gl", SyGL);
+  }
 </script>
 
 <style>
@@ -1062,6 +1121,13 @@ void main() {
     pointer-events: none;
     top: 0;
     left: 0;
+  }
+
+  /* Скрываем на мобильных устройствах */
+  @media (max-width: 767px) {
+    sy-gl {
+      display: none !important;
+    }
   }
 
   /* Visual divider removed - invisible */

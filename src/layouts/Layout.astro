@@ -15,6 +15,7 @@ const links = [
   { title: t("nav.home"), url: `/${lang}/` },
   { title: t("nav.about"), url: "#about" },
   { title: t("nav.contact"), url: "#contact" },
+  { title: t("nav.book"), url: "#", dataAction: "open-calendar" },
 ];
 
 const langLinks = Object.entries(languages).map(([code, label]) => ({

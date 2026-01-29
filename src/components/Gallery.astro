@@ -59,7 +59,14 @@ const { images, class: className } = Astro.props;
       height: 100%;
       object-fit: cover;
       transform: translateX(var(--ix));
-      will-change: transform;
+      /* Отключаем will-change на слабых устройствах */
+    }
+    
+    /* Включаем will-change только на мощных устройствах */
+    @media (min-width: 1024px) and (min-resolution: 2dppx) {
+      img {
+        will-change: transform;
+      }
     }
   }
 

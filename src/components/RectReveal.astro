@@ -27,10 +27,17 @@ const { class: className, ignoreLast } = Astro.props;
     :global(> *) {
       grid-row: 1;
       grid-column: 1;
-      will-change: clip-path;
+      /* Отключаем will-change на слабых устройствах */
       position: sticky;
       height: 100vh;
       top: 0;
+    }
+    
+    /* Включаем will-change только на мощных устройствах */
+    @media (min-width: 1024px) and (min-resolution: 2dppx) {
+      :global(> *) {
+        will-change: clip-path;
+      }
     }
   }
 </style>

@@ -15,8 +15,15 @@
 
   .i {
     display: inline-block;
-    will-change: transform;
+    /* Отключаем will-change на слабых устройствах для производительности */
     transform: translateZ(0);
+  }
+  
+  /* Включаем will-change только на мощных устройствах */
+  @media (min-width: 1024px) and (min-resolution: 2dppx) {
+    .i {
+      will-change: transform;
+    }
   }
 
   &.u-heading {

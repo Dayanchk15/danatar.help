@@ -37,16 +37,47 @@ export function addIntersectingTicker(el: TickerElement) {
   addIntersectingObserver(el as VisibilityChangeElement);
 }
 
-gsap.ticker.add(tick)
-gsap.ticker.lagSmoothing(0)
+// Оптимизация производительности
+const isLowEndDevice = 
+  (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+  (window.innerWidth < 1024);
+
+// Снижаем FPS на слабых устройствах
+if (isLowEndDevice) {
+  // Определяем производительность устройства
+const isLowEndDevice = 
+  (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+  window.innerWidth < 1024;
+
+gsap.ticker.fps(isLowEndDevice ? 24 : 30); // Еще ниже FPS на слабых устройствах
+}
+
+gsap.ticker.lagSmoothing(0);
+
+// Пауза анимаций при неактивной вкладке
+let isTabVisible = !document.hidden;
+document.addEventListener("visibilitychange", () => {
+  isTabVisible = !document.hidden;
+  if (!isTabVisible) {
+    gsap.ticker.sleep();
+  } else {
+    gsap.ticker.wake();
+  }
+});
 
 function tick(now: number) {
+  // Пропускаем тики если вкладка неактивна
+  if (!isTabVisible) return;
+  
   for (const fn of fns) {
     fn(now)
   }
-
 
   for (const el of visibleElements) {
     el.tick.call(el, now)
   }
 }
+
+gsap.ticker.add(tick)

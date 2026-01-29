@@ -5,31 +5,38 @@ interface ElementWithResize extends HTMLElement {
 
 const resizeElements: ElementWithResize[] = []
 
-window.addEventListener('resize', onResize)
+// Throttle resize для производительности
+let resizeRAF: number | null = null;
+window.addEventListener('resize', onResize, { passive: true })
 let width = -1
 let timeoutID: number;
 
 function onResize() {
   clearTimeout(timeoutID)
+  
+  // Используем requestAnimationFrame для более плавной обработки
+  if (resizeRAF) return;
+  
+  resizeRAF = requestAnimationFrame(() => {
+    timeoutID = window.setTimeout(() => {
+      const widthChanged = width !== window.innerWidth
 
-  timeoutID = window.setTimeout(() => {
-    const widthChanged = width !== window.innerWidth
-
-    for (let i = resizeElements.length - 1; i >= 0; i--) {
-      const el = resizeElements[i];
-      if (!el.isConnected) {
-        resizeElements.splice(i, 1);
-        continue;
-      }
-      el.onResize && el.onResize.call(el);
+      for (let i = resizeElements.length - 1; i >= 0; i--) {
+        const el = resizeElements[i];
+        if (!el.isConnected) {
+          resizeElements.splice(i, 1);
+          continue;
+        }
+        el.onResize && el.onResize.call(el);
         if (widthChanged && el.onWidthResize) {
-        el.onWidthResize.call(el);
+          el.onWidthResize.call(el);
+        }
       }
-    }
 
-    width = window.innerWidth
-  }, 15)
-
+      width = window.innerWidth
+      resizeRAF = null;
+    }, 15)
+  });
 }
 
 export function addResizeObserver(el: ElementWithResize) {

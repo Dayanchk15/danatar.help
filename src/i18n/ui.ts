@@ -15,6 +15,7 @@ export const ui = {
     "nav.home": "Главная",
     "nav.about": "О нас",
     "nav.contact": "Контакты",
+    "nav.book": "Записаться",
     "nav.language": "Язык",
 
     "hero.title": "Мы ускоряем ваш рост в IT",
@@ -161,6 +162,7 @@ export const ui = {
     "nav.home": "Baş sahypa",
     "nav.about": "Biz barada",
     "nav.contact": "Habarlaşmak",
+    "nav.book": "Ýazylmak",
     "nav.language": "Dil",
 
     "hero.title": "IT-de ösüşiňizi çaltlaşdyrýarys",
@@ -307,6 +309,7 @@ export const ui = {
     "nav.home": "Home",
     "nav.about": "About",
     "nav.contact": "Contact",
+    "nav.book": "Book",
     "nav.language": "Language",
 
     "hero.title": "We accelerate your growth in IT",
