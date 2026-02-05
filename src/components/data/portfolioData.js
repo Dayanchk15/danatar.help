@@ -4,11 +4,12 @@
  * @property {string} imgSrc Url de la imagen
  * @property {string} title Titulo de la tarjeta
  * @property {string[]} skills Array con tus habilidades ej: ['React', 'CSS', 'JavaScript']
+ * @property {string[]} [categories] Array con categorías para filtrado
  * @property {string} descripcion La descripcion de la tarjeta
  * @property {string} demoURL Url de una pagina de demostración
  * @property {string} repoURL Url del repositorio, ej: https://github.com/usuario/repo
  * @property {string} anim La animación que se ejecutará cuando se cargue la tarjeta, ej: fade-up, fade-right, fade-left, fade-down
- * @property {number} averageBrightness Cuanto brillo tendrá el color de fondo de la tarjeta, ej: 0.1
+ * @property {number} [averageBrightness] Cuanto brillo tendrá el color de fondo de la tarjeta, ej: 0.1
  */
 
 /**

@@ -25,3 +25,47 @@ import Boton from '../atoms/Boton.astro';
 	/>
 	</div>
 </section>
+
+<div id="heroConsultationModal" class="modal">
+	<div class="modal__content">
+		<button class="modal__close" id="closeHeroConsultationModal">&times;</button>
+		<h2 class="modal__title" data-i18n-key="hero.modal.title">Записаться на встречу</h2>
+		<p class="hero__modal-text" data-i18n-key="hero.modal.text">
+			Выберите удобное время для консультации через Cal.com.
+		</p>
+		<div class="hero__cal-frame-wrapper">
+			<iframe
+				class="hero__cal-frame"
+				src="https://cal.com/dany-danatarow-uioayz?embed=1"
+				title="Запись на встречу в Cal.com"
+				frameborder="0"
+				scrolling="no"
+				allowfullscreen
+			></iframe>
+		</div>
+	</div>
+</div>
+
+<script>
+	const heroBtn = document.querySelector('.hero .primary.button');
+	const heroModal = document.getElementById('heroConsultationModal');
+	const closeHeroModalBtn = document.getElementById('closeHeroConsultationModal');
+
+	heroBtn?.addEventListener('click', (e) => {
+		e.preventDefault();
+		heroModal?.classList.add('is-open');
+		document.body.style.overflow = 'hidden';
+	});
+
+	closeHeroModalBtn?.addEventListener('click', () => {
+		heroModal?.classList.remove('is-open');
+		document.body.style.overflow = '';
+	});
+
+	heroModal?.addEventListener('click', (e) => {
+		if (e.target === heroModal) {
+			heroModal.classList.remove('is-open');
+			document.body.style.overflow = '';
+		}
+	});
+</script>

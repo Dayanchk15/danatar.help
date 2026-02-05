@@ -150,6 +150,84 @@ If you encounter any bugs or have issues, please report them [here](https://gith
 
 For more information and detailed documentation, visit the [homepage](https://github.com/SofiDevO/portfolio-astrosofidev-garrux#readme).
 
+## Development
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Run Development Server
+
+```bash
+npm run dev
+```
+
+The site will be available at `http://localhost:4321`
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+This will create an optimized production build in the `dist/` directory.
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+## Deployment
+
+This project is ready to deploy to various platforms. Configuration files are included for popular hosting services.
+
+### Environment Variables
+
+Before deploying, set the `PUBLIC_SITE_URL` environment variable to your production domain:
+
+```bash
+PUBLIC_SITE_URL=https://your-domain.com
+```
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Import your repository in [Vercel](https://vercel.com)
+3. Vercel will automatically detect the Astro framework
+4. Add the `PUBLIC_SITE_URL` environment variable
+5. Deploy!
+
+The `vercel.json` configuration file is already included.
+
+### Deploy to Netlify
+
+1. Push your code to GitHub
+2. Import your repository in [Netlify](https://www.netlify.com)
+3. Netlify will automatically detect the build settings from `netlify.toml`
+4. Add the `PUBLIC_SITE_URL` environment variable
+5. Deploy!
+
+The `netlify.toml` configuration file is already included.
+
+### Deploy to Other Platforms
+
+For other platforms (GitHub Pages, Cloudflare Pages, etc.):
+
+1. Build the project: `npm run build`
+2. Deploy the `dist/` directory
+3. Make sure to set the `PUBLIC_SITE_URL` environment variable to your production domain
+
+### Build Output
+
+The production build is output to the `dist/` directory, which contains:
+- Static HTML files
+- Optimized CSS and JavaScript
+- Assets from the `public/` directory
+- Sitemap (if configured)
+
 ---
 
 Enjoy building your portfolio! If you have any questions or run into any issues, feel free to reach out.

@@ -69,7 +69,7 @@ import './contacts.css';
 	const modal = document.getElementById('contactModal');
 	const openBtn = document.getElementById('openContactModal');
 	const closeBtn = document.getElementById('closeContactModal');
-	const form = document.getElementById('contactForm');
+	const form = document.getElementById('contactForm') as HTMLFormElement | null;
 
 	openBtn?.addEventListener('click', () => {
 		modal?.classList.add('is-open');

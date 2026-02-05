@@ -39,7 +39,7 @@ import Card from './card-portfolio/CardPortfolio.astro';
 
 		<div class="portfolio__elements">
 			{
-				getPortafolioData.map((props) => (
+				getPortafolioData.map((props: any) => (
 					<div
 						class="portfolio-item"
 						data-categories={props.categories?.join(",") ?? ""}
@@ -114,7 +114,8 @@ import Card from './card-portfolio/CardPortfolio.astro';
 
 		function applyFilter(value) {
 			items.forEach((item) => {
-				const cats = (item.dataset.categories || "")
+				const element = item as HTMLElement;
+				const cats = (element.dataset.categories || "")
 					.split(",")
 					.map((s) => s.trim())
 					.filter(Boolean);
@@ -122,13 +123,14 @@ import Card from './card-portfolio/CardPortfolio.astro';
 				const visible =
 					value === "all" ? true : cats.includes(value);
 
-				item.style.display = visible ? "" : "none";
+				element.style.display = visible ? "" : "none";
 			});
 		}
 
 		filters.forEach((btn) => {
 			btn.addEventListener("click", () => {
-				const value = btn.dataset.filter || "all";
+				const button = btn as HTMLElement;
+				const value = button.dataset.filter || "all";
 				filters.forEach((b) =>
 					b.classList.toggle(
 						"is-active",

@@ -40,6 +40,9 @@ const { title, lang = 'ru' } = Astro.props;
 					"hero.text": "Краткое и цепляющее описание основного направления сайта",
 					"hero.slogan": "Доверия от вас результат от нас",
 					"hero.cta": "Получить консультацию",
+					"hero.modal.title": "Записаться на встречу",
+					"hero.modal.text": "Выберите удобное время для консультации через Cal.com.",
+					"hero.modal.button": "Записаться на встречу в Cal.com",
 
 					"about.title": "О нас",
 					"about.text":
@@ -72,6 +75,9 @@ const { title, lang = 'ru' } = Astro.props;
 					"hero.text": "A short, catchy description about the main topic of the site",
 					"hero.slogan": "Trust from you, results from us",
 					"hero.cta": "Get a consultation",
+					"hero.modal.title": "Book a meeting",
+					"hero.modal.text": "Choose a convenient time for your consultation via Cal.com.",
+					"hero.modal.button": "Book a meeting on Cal.com",
 
 					"about.title": "About us",
 					"about.text":
@@ -105,6 +111,9 @@ const { title, lang = 'ru' } = Astro.props;
 						"Sahypanyň esasy mowzugy barada gysga we täsirli düşündiriş",
 					"hero.slogan": "Sizden ynam, bizden netije",
 					"hero.cta": "Konsultasiýa almak",
+					"hero.modal.title": "Duşuşyk belle",
+					"hero.modal.text": "Cal.com arkaly maslahat üçin size laýyk wagty saýlaň.",
+					"hero.modal.button": "Cal.com arkaly duşuşyk belle",
 
 					"about.title": "Biz barada",
 					"about.text":
@@ -132,14 +141,15 @@ const { title, lang = 'ru' } = Astro.props;
 				const dict = translations[lang] || translations.ru;
 				document.documentElement.lang = lang;
 
-				document
-					.querySelectorAll("[data-i18n-key]")
-					.forEach((el) => {
-						const key = el.dataset.i18nKey;
-						if (key && dict[key]) {
-							el.textContent = dict[key];
-						}
-					});
+			document
+				.querySelectorAll("[data-i18n-key]")
+				.forEach((el) => {
+					const element = el as HTMLElement;
+					const key = element.dataset.i18nKey;
+					if (key && dict[key]) {
+						element.textContent = dict[key];
+					}
+				});
 
 				// Обновляем текст кнопки в hero
 				const heroBtn = document.querySelector(".hero .primary.button");
@@ -147,14 +157,15 @@ const { title, lang = 'ru' } = Astro.props;
 					heroBtn.textContent = dict["hero.cta"];
 				}
 
-				document
-					.querySelectorAll("[data-lang-btn]")
-					.forEach((btn) => {
-						btn.classList.toggle(
-							"is-active",
-							btn.dataset.langBtn === lang,
-						);
-					});
+			document
+				.querySelectorAll("[data-lang-btn]")
+				.forEach((btn) => {
+					const button = btn as HTMLElement;
+					button.classList.toggle(
+						"is-active",
+						button.dataset.langBtn === lang,
+					);
+				});
 
 				try {
 					window.localStorage.setItem("lang", lang);
@@ -172,15 +183,15 @@ const { title, lang = 'ru' } = Astro.props;
 				applyLang(initial);
 			})();
 
-			document.addEventListener("click", (event) => {
-				const target = event.target.closest("[data-lang-btn]");
-				if (!target) return;
-				event.preventDefault();
-				const lang = target.dataset.langBtn;
-				if (lang) {
-					applyLang(lang);
-				}
-			});
+		document.addEventListener("click", (event) => {
+			const target = (event.target as HTMLElement)?.closest("[data-lang-btn]") as HTMLElement | null;
+			if (!target) return;
+			event.preventDefault();
+			const lang = target.dataset.langBtn;
+			if (lang) {
+				applyLang(lang);
+			}
+		});
 		</script>
 	</body>
 </html>

@@ -50,6 +50,51 @@
 	font-style: italic;
 }
 
+.hero__modal-text {
+	font-size: var(--text-large);
+	color: var(--primary-100);
+	margin-bottom: 1.5rem;
+}
+
+/* Стили для модального окна hero */
+#heroConsultationModal .modal__content {
+	max-width: 900px;
+	width: 90vw;
+	max-height: 85vh;
+	height: auto;
+	padding: 1.5rem;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+#heroConsultationModal .modal__title {
+	margin-bottom: 0.75rem;
+	font-size: var(--text-x-large);
+}
+
+#heroConsultationModal .hero__modal-text {
+	margin-bottom: 0.75rem;
+	font-size: var(--text-medium);
+}
+
+.hero__cal-frame-wrapper {
+	width: 100%;
+	height: 600px;
+	max-height: calc(85vh - 120px);
+	border-radius: 12px;
+	overflow: hidden;
+	position: relative;
+}
+
+.hero__cal-frame {
+	width: 100%;
+	height: 100%;
+	border: none;
+	overflow: hidden;
+	display: block;
+}
+
 .hero__container .text__content {
 	font-weight: 600;
 	display: flex;
