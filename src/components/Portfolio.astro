@@ -9,7 +9,9 @@ import Card from './card-portfolio/CardPortfolio.astro';
 	class="flex flex-col w-full  justify-center items-center h-auto min-h-[100dvh]  "
 >
 	<div class="portfolio__container">
-		<Title contenido="Portafolio" i18nKey="portfolio.title" />
+		<div class="portfolio__title">
+			<Title contenido="Услуги" i18nKey="portfolio.title" />
+		</div>
 
 		<div class="portfolio__filters">
 			<button type="button" class="filter is-active" data-filter="all">
@@ -51,6 +53,23 @@ import Card from './card-portfolio/CardPortfolio.astro';
 </section>
 
 <style>
+	#portafolio {
+		margin-top: 3rem;
+	}
+
+	@media screen and (min-width: 768px) and (max-width: 1024px) {
+		#portafolio {
+			margin-top: 10rem;
+		}
+	}
+
+	.portfolio__title {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		text-align: center;
+	}
+
 	.portfolio__elements {
 		max-width: var(--max-width);
 		display: flex;

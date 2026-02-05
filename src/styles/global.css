@@ -55,10 +55,11 @@
 	--max-width: 108rem;
 	--site-bg: var(--primary-0);
 	--hero-bg: linear-gradient(
-		-54deg,
-		var(--primary-0) -23%,
-		var(--primary-20),
-		var(--primary-0) 51%
+		to bottom,
+		var(--primary-0) 0%,
+		var(--primary-0) 25%,
+		var(--primary-20) 55%,
+		var(--primary-0) 100%
 	);
 
 	--text-gradient: radial-gradient(
