@@ -58,10 +58,10 @@
 
 /* Стили для модального окна hero */
 #heroConsultationModal .modal__content {
-	max-width: 900px;
-	width: 90vw;
-	max-height: 85vh;
-	height: auto;
+	max-width: 1200px;
+	width: 95vw;
+	max-height: 95vh;
+	height: 95vh;
 	padding: 1.5rem;
 	display: flex;
 	flex-direction: column;
@@ -69,19 +69,21 @@
 }
 
 #heroConsultationModal .modal__title {
-	margin-bottom: 0.75rem;
+	margin-bottom: 0.5rem;
 	font-size: var(--text-x-large);
+	flex-shrink: 0;
 }
 
 #heroConsultationModal .hero__modal-text {
-	margin-bottom: 0.75rem;
+	margin-bottom: 0.5rem;
 	font-size: var(--text-medium);
+	flex-shrink: 0;
 }
 
 .hero__cal-frame-wrapper {
 	width: 100%;
-	height: 600px;
-	max-height: calc(85vh - 120px);
+	flex: 1;
+	min-height: 0;
 	border-radius: 12px;
 	overflow: hidden;
 	position: relative;
@@ -91,8 +93,26 @@
 	width: 100%;
 	height: 100%;
 	border: none;
-	overflow: hidden;
 	display: block;
+}
+
+@media screen and (max-width: 768px) {
+	#heroConsultationModal .modal__content {
+		width: 98vw;
+		height: 98vh;
+		max-height: 98vh;
+		padding: 1rem;
+	}
+	
+	#heroConsultationModal .modal__title {
+		font-size: var(--text-large);
+		margin-bottom: 0.25rem;
+	}
+	
+	#heroConsultationModal .hero__modal-text {
+		font-size: var(--text-small);
+		margin-bottom: 0.25rem;
+	}
 }
 
 .hero__container .text__content {
