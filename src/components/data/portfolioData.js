@@ -20,10 +20,12 @@ export const portafolioData = [
 	{
 		imgSrc: '/img/img/web_design.jpg',
 		title: 'Веб‑дизайн',
-		skills: ['React', 'CSS'],
-		categories: ['web', 'design'],
+		titleKey: 'portfolio.item.web_design.title',
 		descripcion:
 			'Создаём современные адаптивные сайты с чистым дизайном и удобной структурой, которые работают быстро и продают.',
+		descripcionKey: 'portfolio.item.web_design.description',
+		skills: ['React', 'CSS'],
+		categories: ['web', 'design'],
 		demoURL: '',
 		repoURL: '',
 		anim: 'fade-right',
@@ -31,10 +33,12 @@ export const portafolioData = [
 	{
 		imgSrc: '/img/img/seo_optimization.webp',
 		title: 'SEO‑оптимизация',
-		skills: ['JavaScript', 'Astro'],
-		categories: ['seo', 'marketing'],
+		titleKey: 'portfolio.item.seo.title',
 		descripcion:
 			'Анализируем сайт, подбираем ключевые запросы, улучшаем структуру и контент, чтобы вы росли в поиске и получали органический трафик.',
+		descripcionKey: 'portfolio.item.seo.description',
+		skills: ['JavaScript', 'Astro'],
+		categories: ['seo', 'marketing'],
 		demoURL: '',
 		repoURL: '',
 		anim: 'fade-up',
@@ -43,10 +47,12 @@ export const portafolioData = [
 	{
 		imgSrc: '/img/img/online_marketing.jpg',
 		title: 'Онлайн‑маркетинг',
-		skills: ['React', 'Tailwind'],
-		categories: ['marketing'],
+		titleKey: 'portfolio.item.marketing.title',
 		descripcion:
 			'Строим комплексные рекламные кампании: соцсети, контекст, e‑mail. Помогаем выстроить воронку и сопровождение клиентов.',
+		descripcionKey: 'portfolio.item.marketing.description',
+		skills: ['React', 'Tailwind'],
+		categories: ['marketing'],
 		demoURL: '',
 		repoURL: '',
 		anim: 'fade-left',
@@ -54,10 +60,12 @@ export const portafolioData = [
 	{
 		imgSrc: '/img/img/bussines_awtomatization.jpg',
 		title: 'Бизнес‑автоматизация',
-		skills: ['Nodejs', 'MongoDB'],
-		categories: ['automation', 'dev'],
+		titleKey: 'portfolio.item.automation.title',
 		descripcion:
 			'Автоматизируем рутинные процессы: заявки, отчёты, интеграции с CRM и мессенджерами, чтобы команда тратила меньше времени на ручную работу.',
+		descripcionKey: 'portfolio.item.automation.description',
+		skills: ['Nodejs', 'MongoDB'],
+		categories: ['automation', 'dev'],
 		demoURL: '',
 		repoURL: '',
 		anim: 'fade-up',
@@ -65,10 +73,12 @@ export const portafolioData = [
 	{
 		imgSrc: '/img/img/graphic_design.webp',
 		title: 'Графический дизайн',
-		skills: ['CSS', 'Sass'],
-		categories: ['design'],
+		titleKey: 'portfolio.item.graphic_design.title',
 		descripcion:
 			'Разрабатываем бренд‑айдентику, логотипы, визуальные концепции для сайтов и соцсетей в едином стиле.',
+		descripcionKey: 'portfolio.item.graphic_design.description',
+		skills: ['CSS', 'Sass'],
+		categories: ['design'],
 		demoURL: '',
 		repoURL: '',
 		anim: 'fade-left',
@@ -76,10 +86,12 @@ export const portafolioData = [
 	{
 		imgSrc: '/img/img/print_design.jpg',
 		title: 'Дизайн печатной продукции',
-		skills: ['CSS', 'StyledComponents'],
-		categories: ['design', 'print'],
+		titleKey: 'portfolio.item.print_design.title',
 		descripcion:
 			'Макеты для визиток, буклетов, упаковки, наружной рекламы — готовые к печати файлы с аккуратной типографикой.',
+		descripcionKey: 'portfolio.item.print_design.description',
+		skills: ['CSS', 'StyledComponents'],
+		categories: ['design', 'print'],
 		demoURL: '',
 		repoURL: '',
 		anim: 'fade-right',
@@ -87,10 +99,12 @@ export const portafolioData = [
 	{
 		imgSrc: '/img/img/website_design_development.png',
 		title: 'Разработка дизайна сайта',
-		skills: ['React', 'Tailwind'],
-		categories: ['web', 'design'],
+		titleKey: 'portfolio.item.website_design.title',
 		descripcion:
 			'Прорабатываем UX и UI под ваши задачи: прототипы, дизайн‑система, адаптивные макеты и передача в разработку.',
+		descripcionKey: 'portfolio.item.website_design.description',
+		skills: ['React', 'Tailwind'],
+		categories: ['web', 'design'],
 		demoURL: '',
 		repoURL: '',
 		anim: 'fade-up',
@@ -98,10 +112,12 @@ export const portafolioData = [
 	{
 		imgSrc: '/img/img/application_development.jpg',
 		title: 'Разработка приложений',
-		skills: ['React', 'Astro'],
-		categories: ['dev'],
+		titleKey: 'portfolio.item.app_development.title',
 		descripcion:
 			'Создаём веб‑приложения и личные кабинеты: от MVP до боевых версий с интеграциями и аналитикой.',
+		descripcionKey: 'portfolio.item.app_development.description',
+		skills: ['React', 'Astro'],
+		categories: ['dev'],
 		demoURL: '',
 		repoURL: '',
 		anim: 'fade-left',
@@ -109,10 +125,12 @@ export const portafolioData = [
 	{
 		imgSrc: '/img/img/code_help.png',
 		title: 'Помощь по коду',
-		skills: ['JavaScript', 'CSS'],
-		categories: ['dev', 'consult'],
+		titleKey: 'portfolio.item.code_help.title',
 		descripcion:
 			'Помогаем с багами, рефакторингом и оптимизацией существующих проектов, даём рекомендации по архитектуре и стеку.',
+		descripcionKey: 'portfolio.item.code_help.description',
+		skills: ['JavaScript', 'CSS'],
+		categories: ['dev', 'consult'],
 		demoURL: '',
 		repoURL: '',
 		anim: 'fade-right',
@@ -120,10 +138,12 @@ export const portafolioData = [
 	{
 		imgSrc: '/img/img/consultation.jpg',
 		title: 'Консультация',
-		skills: ['Astro', 'React'],
-		categories: ['consult'],
+		titleKey: 'portfolio.item.consultation.title',
 		descripcion:
 			'Разбираем ваш проект, даём понятный план по развитию: от выбора технологий до маркетинга и аналитики.',
+		descripcionKey: 'portfolio.item.consultation.description',
+		skills: ['Astro', 'React'],
+		categories: ['consult'],
 		demoURL: '',
 		repoURL: '',
 		anim: 'fade-up',

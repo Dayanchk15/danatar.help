@@ -2,7 +2,9 @@
 import './card-portfolio.css';
 const {
 	title,
+	titleKey,
 	descripcion,
+	descripcionKey,
 	imgSrc,
 	averageBrightness,
 } = Astro.props;
@@ -20,9 +22,9 @@ const {
 	/>
 
 	<div class="descripcion__container">
-		<h2 class="card__title">{title}</h2>
+		<h2 class="card__title" data-i18n-key={titleKey}>{title}</h2>
 		<div class="descripcion">
-			<p>{descripcion}</p>
+			<p data-i18n-key={descripcionKey}>{descripcion}</p>
 		</div>
 	</div>
 </div>
