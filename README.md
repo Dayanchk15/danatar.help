@@ -1,10 +1,9 @@
-### start using this template by running:
- `npm create astro@latest -- --template SofiDevO/portfolio-sofidev-garrux`
 # Portfolio Template with Astro
 
 Welcome to the Portfolio Template built with Astro! This responsive template allows you to showcase all your projects with an amazing UI. Below you'll find instructions on how to use this template, including how to add new portfolio items, main dependencies, and examples of usage.
 
 ![Portada](image-1.png)
+
 ## Table of Contents
 
 1. [Usage](#usage)
@@ -12,13 +11,15 @@ Welcome to the Portfolio Template built with Astro! This responsive template all
 3. [Adding Icons with Iconify](#adding-icons-with-iconify)
 4. [Technologies Used](#technologies-used)
 5. [Figma Design](#figma-design)
-6. [Author and License](#author-and-license)
-7. [Bugs and Issues](#bugs-and-issues)
-8. [Homepage](#homepage)
+6. [Development](#development)
+7. [Deployment](#deployment)
+8. [Author and License](#author-and-license)
+9. [Bugs and Issues](#bugs-and-issues)
+10. [Homepage](#homepage)
 
 ## Usage
 
-To add new elements to your portfolio, you need to add them in `/src/data/portfolioData.js`.
+To add new elements to your portfolio, you need to add them in `/src/components/data/portfolioData.js`.
 
 ## Portfolio Data Format
 
@@ -26,35 +27,38 @@ The data for your portfolio should follow this format:
 
 ```js
 /**
- * @typedef PortfolioData
+ * @typedef PortafolioData
  * @property {string} imgSrc - URL of the image
  * @property {string} title - Title of the card
  * @property {string[]} skills - Array of your skills, e.g., ['React', 'CSS', 'JavaScript']
- * @property {string} description - Description of the card
+ * @property {string[]} [categories] - Array of categories for filtering
+ * @property {string} descripcion - Description of the card
  * @property {string} demoURL - URL of a demo page
  * @property {string} repoURL - URL of the repository, e.g., https://github.com/user/repo
  * @property {string} anim - Animation that will play when the card loads, e.g., fade-up, fade-right, fade-left, fade-down
- * @property {number} averageBrightness - Brightness level of the card's background color, e.g., 0.1
+ * @property {number} [averageBrightness] - Brightness level of the card's background color, e.g., 0.1
  */
 
 /**
- * @type {PortfolioData[]}
+ * @type {PortafolioData[]}
  */
-export const portfolioData = [
+export const portafolioData = [
     {
-        imgSrc: 'https://dt2sdf0db8zob.cloudfront.net/wp-content/uploads/2021/06/copy-of-the-6-best-restaurant-website-templates-1.png',
-        title: 'Restaurant',
-        skills: ['React', 'StyledComponents'],
-        description: 'Laboris ex laboris mollit esse fugiat aute cillum nostrud enim dolor sit. Reprehenderit et non nulla irure aute nostrud commodo aute.',
+        imgSrc: '/img/img/web_design.jpg',
+        title: 'Веб‑дизайн',
+        skills: ['React', 'CSS'],
+        categories: ['web', 'design'],
+        descripcion: 'Создаём современные адаптивные сайты с чистым дизайном и удобной структурой.',
         demoURL: '',
         repoURL: '',
         anim: 'fade-right',
     },
     {
-        imgSrc: 'https://fiverr-res.cloudinary.com/images/q_auto,f_auto/gigs/299377097/original/7eb7dcebe244fcf5ad75d92b0969fc116946bd57/create-professional-amd-responsive-wordpress-website.jpg',
-        title: 'E-commerce',
-        skills: ['JavaScript', 'Bootstrap'],
-        description: 'Laboris ex laboris mollit esse fugiat aute cillum nostrud enim dolor sit. Reprehenderit et non nulla irure aute nostrud commodo aute.',
+        imgSrc: '/img/img/seo_optimization.webp',
+        title: 'SEO‑оптимизация',
+        skills: ['JavaScript', 'Astro'],
+        categories: ['seo', 'marketing'],
+        descripcion: 'Анализируем сайт, подбираем ключевые запросы, улучшаем структуру и контент.',
         demoURL: '',
         repoURL: '',
         anim: 'fade-up',
@@ -75,9 +79,9 @@ const skillIcons = {
 };
 
 /**
- * @description Maps portfolioData to include skill icons
+ * @description Maps portafolioData to include skill icons
  */
-export const getPortfolioData = portfolioData.map((item) => ({
+export const getPortafolioData = portafolioData.map((item) => ({
     ...item,
     skills: item.skills.map((skill) => skillIcons[skill]),
 }));
@@ -123,6 +127,16 @@ Add the Iconify script to the `<head>` section of your project:
 
 Once this script is included, you can use any Iconify icon by specifying its identifier.
 
+## Features
+
+- 🎨 **Modern UI/UX** - Responsive design with smooth animations
+- 🌐 **Multi-language Support** - Built-in i18n for Russian, English, and Turkmen
+- 📅 **Cal.com Integration** - Booking consultation modal with embedded Cal.com widget
+- 📱 **Fully Responsive** - Works perfectly on all devices
+- ⚡ **Fast Performance** - Optimized with Astro's static site generation
+- 🎯 **Portfolio Filtering** - Filter portfolio items by categories
+- 📝 **Blog Support** - Content collections for blog posts
+
 ## Technologies Used
 
 This template leverages several modern technologies to create a highly responsive and visually appealing portfolio:
@@ -130,8 +144,8 @@ This template leverages several modern technologies to create a highly responsiv
 - **Astro**: A modern static site builder that allows you to use your favorite frameworks such as React, Vue, and Svelte. It optimizes for performance by shipping less JavaScript.
 - **React**: A JavaScript library for building user interfaces, which allows for the creation of reusable components.
 - **Tailwind CSS**: A utility-first CSS framework that enables you to design directly in your markup, providing flexibility and control over your styling.
-- **Styled Components**: A library for React and React Native that allows you to use component-level styles in your application. It utilizes tagged template literals to style components.
 - **Iconify**: A comprehensive library for icons that provides access to thousands of icons from different collections, all accessible via a single syntax.
+- **Cal.com**: Integration for booking consultations and meetings directly from the website.
 
 ## Figma Design
 
@@ -152,6 +166,10 @@ For more information and detailed documentation, visit the [homepage](https://gi
 
 ## Development
 
+### Prerequisites
+
+- Node.js 18+ and npm
+
 ### Install Dependencies
 
 ```bash
@@ -165,6 +183,13 @@ npm run dev
 ```
 
 The site will be available at `http://localhost:4321`
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build locally
+- `npm start` - Alias for `npm run dev`
 
 ### Build for Production
 
@@ -180,17 +205,33 @@ This will create an optimized production build in the `dist/` directory.
 npm run preview
 ```
 
+This will serve the production build locally for testing.
+
 ## Deployment
 
 This project is ready to deploy to various platforms. Configuration files are included for popular hosting services.
 
 ### Environment Variables
 
-Before deploying, set the `PUBLIC_SITE_URL` environment variable to your production domain:
+Before deploying, set the `PUBLIC_SITE_URL` environment variable to your production domain. This is used for sitemap generation:
 
 ```bash
 PUBLIC_SITE_URL=https://your-domain.com
 ```
+
+### Cal.com Configuration
+
+The project includes a Cal.com integration for booking consultations. To configure it:
+
+1. Update the Cal.com username in `src/components/hero/Hero.astro`:
+   ```astro
+   <iframe
+       src="https://cal.com/your-username?embed=1"
+       ...
+   />
+   ```
+
+2. Replace `your-username` with your actual Cal.com username (e.g., `dany-danatarow-uioayz`)
 
 ### Deploy to Vercel
 
@@ -226,7 +267,25 @@ The production build is output to the `dist/` directory, which contains:
 - Static HTML files
 - Optimized CSS and JavaScript
 - Assets from the `public/` directory
-- Sitemap (if configured)
+- Sitemap (`sitemap-index.xml` and individual sitemaps)
+
+### Project Structure
+
+```
+├── public/          # Static assets (images, fonts, etc.)
+├── src/
+│   ├── components/  # Astro components
+│   │   ├── data/    # Data files (portfolio, menu)
+│   │   └── ...
+│   ├── content/     # Content collections (blog posts)
+│   ├── layouts/     # Page layouts
+│   ├── pages/       # Route pages
+│   ├── styles/      # Global styles
+│   └── utils/       # Utility functions
+├── astro.config.mjs # Astro configuration
+├── package.json     # Dependencies and scripts
+└── README.md        # This file
+```
 
 ---
 
