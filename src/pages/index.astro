@@ -1,33 +1,21 @@
 ---
-import { defaultLang } from "../i18n/ui";
+import About from '../components/About/About.astro';
+import { mainMenu } from '../components/data/menuData';
+import Footer from '../components/Footer/Footer.astro';
+import Header from '../components/header/Header.astro';
+import Hero from '../components/hero/Hero.astro';
+import Portfolio from '../components/Portfolio.astro';
+import Contacts from '../components/Contacts/Contacts.astro';
+import Layout from '../layouts/Layout.astro';
 ---
 
-<!doctype html>
-<html lang={defaultLang}>
-  <head>
-    <meta charset="utf-8" />
-    <title>Danny</title>
-    <script is:inline define:vars={{ defaultLang }}>
-      // Мгновенный редирект без видимого сообщения
-      (function() {
-        const currentPath = window.location.pathname;
-        
-        // Проверяем, не находимся ли мы уже на языковой версии
-        if (!currentPath.startsWith(`/${defaultLang}/`) && currentPath !== `/${defaultLang}`) {
-          // Определяем язык из браузера или используем дефолтный
-          const browserLang = navigator.language.split('-')[0];
-          const supportedLangs = ['ru', 'en', 'tk'];
-          const lang = supportedLangs.includes(browserLang) ? browserLang : defaultLang;
-          
-          // Мгновенный редирект
-          window.location.replace(`/${lang}/`);
-        }
-      })();
-    </script>
-  </head>
-  <body style="margin:0;padding:0;background:transparent;">
-    <!-- Пустое тело для мгновенного редиректа -->
-  </body>
-</html>
----
-
+<Layout title="Danny | Web & Marketing Services">
+	<Header origin={mainMenu} />
+	<main class="self-center w-full">
+		<Hero />
+		<Portfolio />
+		<Contacts />
+		<About />
+	</main>
+	<Footer/>
+</Layout>

@@ -1,0 +1,111 @@
+---
+import Title from '../atoms/Title.astro';
+import './contacts.css';
+---
+
+<section id="contacts">
+	<div class="contacts__container">
+		<Title contenido="Контакты" i18nKey="contacts.title" />
+		<div class="contacts__content">
+			<div class="contacts__info">
+				<p class="contacts__text" data-i18n-key="contacts.text">
+					Свяжитесь с нами для получения консультации или обсуждения вашего проекта
+				</p>
+				<div class="contacts__details">
+					<div class="contact__item">
+						<iconify-icon icon="mdi:map-marker" width="24" height="24"></iconify-icon>
+						<span data-i18n-key="contacts.location">Туркменистан, Мары</span>
+					</div>
+					<div class="contact__item">
+						<iconify-icon icon="mdi:email" width="24" height="24"></iconify-icon>
+						<a href="mailto:danatarowdanny@gmail.com">danatarowdanny@gmail.com</a>
+					</div>
+					<div class="contact__item">
+						<iconify-icon icon="mdi:phone" width="24" height="24"></iconify-icon>
+						<a href="tel:+99360000000">+993 60 000 000</a>
+					</div>
+					<div class="contact__item">
+						<iconify-icon icon="mdi:phone" width="24" height="24"></iconify-icon>
+						<a href="tel:+99361111111">+993 61 111 111</a>
+					</div>
+				</div>
+				<button class="contact__btn" id="openContactModal" data-i18n-key="contacts.button">
+					Связаться
+				</button>
+			</div>
+		</div>
+	</div>
+</section>
+
+<div id="contactModal" class="modal">
+	<div class="modal__content">
+		<button class="modal__close" id="closeContactModal">&times;</button>
+		<h2 class="modal__title" data-i18n-key="contacts.modal.title">Связаться с нами</h2>
+		<form id="contactForm" class="contact__form">
+			<div class="form__group">
+				<label for="firstName" data-i18n-key="contacts.form.firstName">Имя</label>
+				<input type="text" id="firstName" name="firstName" required />
+			</div>
+			<div class="form__group">
+				<label for="lastName" data-i18n-key="contacts.form.lastName">Фамилия</label>
+				<input type="text" id="lastName" name="lastName" required />
+			</div>
+			<div class="form__group">
+				<label for="phone" data-i18n-key="contacts.form.phone">Номер телефона</label>
+				<input type="tel" id="phone" name="phone" required />
+			</div>
+			<div class="form__group">
+				<label for="message" data-i18n-key="contacts.form.message">Сообщение</label>
+				<textarea id="message" name="message" rows="5" required></textarea>
+			</div>
+			<button type="submit" class="form__submit" data-i18n-key="contacts.form.submit">
+				Отправить
+			</button>
+		</form>
+	</div>
+</div>
+
+<script>
+	const modal = document.getElementById('contactModal');
+	const openBtn = document.getElementById('openContactModal');
+	const closeBtn = document.getElementById('closeContactModal');
+	const form = document.getElementById('contactForm');
+
+	openBtn?.addEventListener('click', () => {
+		modal?.classList.add('is-open');
+		document.body.style.overflow = 'hidden';
+	});
+
+	closeBtn?.addEventListener('click', () => {
+		modal?.classList.remove('is-open');
+		document.body.style.overflow = '';
+	});
+
+	modal?.addEventListener('click', (e) => {
+		if (e.target === modal) {
+			modal.classList.remove('is-open');
+			document.body.style.overflow = '';
+		}
+	});
+
+	form?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		const formData = new FormData(form);
+		const data = {
+			firstName: formData.get('firstName'),
+			lastName: formData.get('lastName'),
+			phone: formData.get('phone'),
+			message: formData.get('message'),
+		};
+
+		// Отправка через mailto (можно заменить на реальный API)
+		const emailBody = `Имя: ${data.firstName}\nФамилия: ${data.lastName}\nТелефон: ${data.phone}\n\nСообщение:\n${data.message}`;
+		const mailtoLink = `mailto:danatarowdanny@gmail.com?subject=Новое сообщение с сайта&body=${encodeURIComponent(emailBody)}`;
+		window.location.href = mailtoLink;
+
+		// Очистка формы
+		form.reset();
+		modal?.classList.remove('is-open');
+		document.body.style.overflow = '';
+	});
+</script>

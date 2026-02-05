@@ -1,119 +1,183 @@
 ---
-import { Font } from "astro:assets";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-import SmoothScroll from "../components/SmoothScroll.astro";
-import { buildLangPath, getLangFromUrl, useTranslations } from "../i18n/utils";
-import { languages } from "../i18n/ui";
-import "../styles/global.css";
-
-const { title } = Astro.props;
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
-
-const links = [
-  { title: t("nav.home"), url: `/${lang}/` },
-  { title: t("nav.about"), url: "#about" },
-  { title: t("nav.contact"), url: "#contact" },
-  { title: t("nav.book"), url: "#", dataAction: "open-calendar" },
-];
-
-const langLinks = Object.entries(languages).map(([code, label]) => ({
-  code,
-  label,
-  url: buildLangPath(Astro.url, code as keyof typeof languages),
-}));
+import "../styles/global.css"
+interface Props {
+	title: string;
+	lang?: 'ru' | 'en' | 'tk';
+}
+const { title, lang = 'ru' } = Astro.props;
 ---
 
+<!doctype html>
 <html lang={lang}>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
-    <!-- Preconnect to external resources for faster loading -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://app.cal.com" />
-    
-    <!-- DNS prefetch for external resources -->
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-    <link rel="dns-prefetch" href="https://app.cal.com" />
-    
-    <!-- Optimize font loading -->
-    <Font cssVariable="--font-roboto-slab" preload />
-    <Font cssVariable="--font-inter" preload />
-    
-    <title>{title}</title>
-  </head>
-  <body>
-    <a href="#main" class="skip-link">{t("accessibility.skip-to-content")}</a>
-    <Header
-      client:load
-      logoUrl={`/${lang}/`}
-      logoAlt="Danny"
-      links={links}
-      currentLang={lang}
-      langLinks={langLinks}
-      langLabel={t("nav.language")}
-    />
-    <main id="main">
-      <slot />
-    </main>
-    <Footer client:visible logoUrl={`/${lang}/`} logoAlt="Danny" links={links} />
-    <SmoothScroll client:load />
-  </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="Astro description" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+		<title>{title}</title>
+	</head>
+	<body class="flex flex-col">
+			<slot/>
+		<script>
+			const translations = {
+				ru: {
+					"nav.home": "Главная",
+					"nav.about": "О нас",
+					"nav.portfolio": "Услуги",
+					"nav.contact": "Связаться",
+
+					"hero.name": "Danny",
+					"hero.text": "Краткое и цепляющее описание основного направления сайта",
+					"hero.slogan": "Доверия от вас результат от нас",
+					"hero.cta": "Получить консультацию",
+
+					"about.title": "О нас",
+					"about.text":
+						"Мы команда профессионалов, специализирующаяся на веб-дизайне, SEO-оптимизации, онлайн-маркетинге и бизнес-автоматизации. Наша цель — помочь вашему бизнесу расти и развиваться в цифровом пространстве. Мы создаём современные решения, которые работают эффективно и приносят результаты.",
+
+					"contacts.title": "Контакты",
+					"contacts.text": "Свяжитесь с нами для получения консультации или обсуждения вашего проекта",
+					"contacts.location": "Туркменистан, Мары",
+					"contacts.button": "Связаться",
+					"contacts.modal.title": "Связаться с нами",
+					"contacts.form.firstName": "Имя",
+					"contacts.form.lastName": "Фамилия",
+					"contacts.form.phone": "Номер телефона",
+					"contacts.form.message": "Сообщение",
+					"contacts.form.submit": "Отправить",
+
+					"portfolio.title": "Услуги",
+
+					"blog.title": "Мои статьи",
+					"blog.more": "Смотреть все",
+				},
+				en: {
+					"nav.home": "Home",
+					"nav.about": "About us",
+					"nav.portfolio": "Services",
+					"nav.contact": "Contact",
+
+					"hero.name": "Danny",
+					"hero.text": "A short, catchy description about the main topic of the site",
+					"hero.slogan": "Trust from you, results from us",
+					"hero.cta": "Get a consultation",
+
+					"about.title": "About us",
+					"about.text":
+						"We are a team of professionals specializing in web design, SEO optimization, online marketing, and business automation. Our goal is to help your business grow and develop in the digital space. We create modern solutions that work efficiently and deliver results.",
+
+					"contacts.title": "Contacts",
+					"contacts.text": "Contact us for a consultation or to discuss your project",
+					"contacts.location": "Turkmenistan, Mary",
+					"contacts.button": "Contact",
+					"contacts.modal.title": "Contact us",
+					"contacts.form.firstName": "First name",
+					"contacts.form.lastName": "Last name",
+					"contacts.form.phone": "Phone number",
+					"contacts.form.message": "Message",
+					"contacts.form.submit": "Send",
+
+					"portfolio.title": "Services",
+
+					"blog.title": "My articles",
+					"blog.more": "View more",
+				},
+				tk: {
+					"nav.home": "Baş sahypa",
+					"nav.about": "Biz barada",
+					"nav.portfolio": "Hyzmatlar",
+					"nav.contact": "Aragatnaşyk",
+
+					"hero.name": "Danny",
+					"hero.text":
+						"Sahypanyň esasy mowzugy barada gysga we täsirli düşündiriş",
+					"hero.slogan": "Sizden ynam, bizden netije",
+					"hero.cta": "Konsultasiýa almak",
+
+					"about.title": "Biz barada",
+					"about.text":
+						"Biz web-dizaýn, SEO optimizasiýasy, onlaýn marketing we iş awtomatizasiýasy boýunça hünärmenlerden ybarat toparys. Biziň maksadymyz — işiňiziň sanly giňişlikde ösmegi we ösmegi üçin kömek etmekdir. Biz işjeň işleýän we netije berýän häzirki zaman çözgütlerini döredýäris.",
+
+					"contacts.title": "Aragatnaşyk",
+					"contacts.text": "Konsultasiýa almak ýa-da taslamanyňyzy çekişmek üçin biz bilen aragatnaşyň",
+					"contacts.location": "Türkmenistan, Mary",
+					"contacts.button": "Aragatnaşyk",
+					"contacts.modal.title": "Biz bilen aragatnaşyň",
+					"contacts.form.firstName": "Ady",
+					"contacts.form.lastName": "Familiýasy",
+					"contacts.form.phone": "Telefon belgisi",
+					"contacts.form.message": "Habar",
+					"contacts.form.submit": "Ugratmak",
+
+					"portfolio.title": "Hyzmatlar",
+
+					"blog.title": "Makalalarym",
+					"blog.more": "Has köp görmek",
+				},
+			};
+
+			function applyLang(lang) {
+				const dict = translations[lang] || translations.ru;
+				document.documentElement.lang = lang;
+
+				document
+					.querySelectorAll("[data-i18n-key]")
+					.forEach((el) => {
+						const key = el.dataset.i18nKey;
+						if (key && dict[key]) {
+							el.textContent = dict[key];
+						}
+					});
+
+				// Обновляем текст кнопки в hero
+				const heroBtn = document.querySelector(".hero .primary.button");
+				if (heroBtn && dict["hero.cta"]) {
+					heroBtn.textContent = dict["hero.cta"];
+				}
+
+				document
+					.querySelectorAll("[data-lang-btn]")
+					.forEach((btn) => {
+						btn.classList.toggle(
+							"is-active",
+							btn.dataset.langBtn === lang,
+						);
+					});
+
+				try {
+					window.localStorage.setItem("lang", lang);
+				} catch {}
+			}
+
+			(function initLang() {
+				let initial = "ru";
+				try {
+					const saved = window.localStorage.getItem("lang");
+					if (saved && translations[saved]) {
+						initial = saved;
+					}
+				} catch {}
+				applyLang(initial);
+			})();
+
+			document.addEventListener("click", (event) => {
+				const target = event.target.closest("[data-lang-btn]");
+				if (!target) return;
+				event.preventDefault();
+				const lang = target.dataset.langBtn;
+				if (lang) {
+					applyLang(lang);
+				}
+			});
+		</script>
+	</body>
 </html>
-
-<style>
-  .skip-link {
-    background: var(--color-brand-1);
-    left: 0;
-    right: 0;
-    margin: auto;
-    width: min-content;
-    white-space: nowrap;
-    padding: 0.5rem;
-    position: absolute;
-    transform: translateY(-100%);
-    transition: transform 0.3s ease;
-    z-index: 100;
-  }
-
-  .skip-link:focus {
-    transform: translateY(0%);
-  }
-</style>
-
-<script>
-  // Оптимизация: загружаем скрипты после полной загрузки страницы
-  (function() {
-    // Ждем полной загрузки страницы перед загрузкой некритичных скриптов
-    if (document.readyState === 'complete') {
-      loadScripts();
-    } else {
-      window.addEventListener('load', loadScripts, { once: true });
-    }
-    
-    function loadScripts() {
-      // Используем requestIdleCallback для загрузки некритичных скриптов
-      // когда браузер свободен
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => {
-          Promise.all([
-            import("../utils/reveals"),
-            import("../utils/i18nClient")
-          ]).catch(console.error);
-        }, { timeout: 2000 });
-      } else {
-        // Fallback для браузеров без requestIdleCallback
-        setTimeout(() => {
-          Promise.all([
-            import("../utils/reveals"),
-            import("../utils/i18nClient")
-          ]).catch(console.error);
-        }, 100);
-      }
-    }
-  })();
-</script>

@@ -1,0 +1,28 @@
+---
+import './card-portfolio.css';
+const {
+	title,
+	descripcion,
+	imgSrc,
+	averageBrightness,
+} = Astro.props;
+---
+
+<div class="card__portfolio">
+	<img
+		src={imgSrc}
+		alt={title}
+		crossorigin="anonymous"
+		height={130}
+		width={332}
+		loading="lazy"
+		average-brightness={averageBrightness}
+	/>
+
+	<div class="descripcion__container">
+		<h2 class="card__title">{title}</h2>
+		<div class="descripcion">
+			<p>{descripcion}</p>
+		</div>
+	</div>
+</div>

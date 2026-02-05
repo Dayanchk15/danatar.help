@@ -1,0 +1,125 @@
+---
+import Title from './atoms/Title.astro';
+import { getPortafolioData} from "../components/data/portfolioData.js"
+import Card from './card-portfolio/CardPortfolio.astro';
+---
+
+<section
+	id="portafolio"
+	class="flex flex-col w-full  justify-center items-center h-auto min-h-[100dvh]  "
+>
+	<div class="portfolio__container">
+		<Title contenido="Portafolio" i18nKey="portfolio.title" />
+
+		<div class="portfolio__filters">
+			<button type="button" class="filter is-active" data-filter="all">
+				Все
+			</button>
+			<button type="button" class="filter" data-filter="web">
+				Сайты
+			</button>
+			<button type="button" class="filter" data-filter="marketing">
+				Маркетинг
+			</button>
+			<button type="button" class="filter" data-filter="automation">
+				Автоматизация
+			</button>
+			<button type="button" class="filter" data-filter="design">
+				Дизайн
+			</button>
+			<button type="button" class="filter" data-filter="dev">
+				Разработка
+			</button>
+			<button type="button" class="filter" data-filter="consult">
+				Консультации
+			</button>
+		</div>
+
+		<div class="portfolio__elements">
+			{
+				getPortafolioData.map((props) => (
+					<div
+						class="portfolio-item"
+						data-categories={props.categories?.join(",") ?? ""}
+					>
+						<Card {...props} />
+					</div>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<style>
+	.portfolio__elements {
+		max-width: var(--max-width);
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 4rem;
+	}
+
+	.portfolio__filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.8rem;
+		justify-content: center;
+		margin: 2rem 0 1.5rem;
+	}
+
+	.portfolio__filters .filter {
+		padding: 0.55rem 1rem;
+		border-radius: 999px;
+		border: 1px solid rgba(148, 163, 184, 0.6);
+		background: rgba(15, 23, 42, 0.7);
+		color: #e5e7eb;
+		font-size: 1.4rem;
+		cursor: pointer;
+	}
+
+	.portfolio__filters .filter.is-active {
+		background: #fbbf24;
+		color: #111827;
+		border-color: #fde68a;
+	}
+</style>
+
+<script>
+	if (typeof window !== "undefined") {
+		const filters = Array.from(
+			document.querySelectorAll(".portfolio__filters .filter"),
+		);
+		const items = Array.from(
+			document.querySelectorAll(".portfolio-item"),
+		);
+
+		function applyFilter(value) {
+			items.forEach((item) => {
+				const cats = (item.dataset.categories || "")
+					.split(",")
+					.map((s) => s.trim())
+					.filter(Boolean);
+
+				const visible =
+					value === "all" ? true : cats.includes(value);
+
+				item.style.display = visible ? "" : "none";
+			});
+		}
+
+		filters.forEach((btn) => {
+			btn.addEventListener("click", () => {
+				const value = btn.dataset.filter || "all";
+				filters.forEach((b) =>
+					b.classList.toggle(
+						"is-active",
+						b === btn,
+					),
+				);
+				applyFilter(value);
+			});
+		});
+
+		applyFilter("all");
+	}
+</script>

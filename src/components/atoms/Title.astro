@@ -1,0 +1,18 @@
+---
+const { contenido, margin = "0", i18nKey } = Astro.props;
+---
+
+<h2
+  class="color__gradiente"
+  style={`margin-bottom:${margin}`}
+  data-i18n-key={i18nKey}
+>
+  {contenido}
+</h2>
+
+<style>
+	h2 {
+		font-size: 5rem;
+		font-weight: 500;
+	}
+</style>

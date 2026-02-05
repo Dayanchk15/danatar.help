@@ -1,101 +1,155 @@
-# Danny - Personal Portfolio Website
+### start using this template by running:
+ `npm create astro@latest -- --template SofiDevO/portfolio-sofidev-garrux`
+# Portfolio Template with Astro
 
-Современный многоязычный сайт-портфолио на Astro с интерактивными 3D элементами.
+Welcome to the Portfolio Template built with Astro! This responsive template allows you to showcase all your projects with an amazing UI. Below you'll find instructions on how to use this template, including how to add new portfolio items, main dependencies, and examples of usage.
 
-## 🌟 Особенности
+![Portada](image-1.png)
+## Table of Contents
 
-- ✨ Современный дизайн с glassmorphism эффектами
-- 🌍 Многоязычная поддержка (Русский, Английский, Туркменский)
-- 🎨 Интерактивные 3D элементы (Three.js)
-- 📱 Полностью адаптивный дизайн
-- ⚡ Оптимизированная производительность
-- 📅 Интеграция с Cal.com для записи на встречи
-- 📧 Контактная форма
+1. [Usage](#usage)
+2. [Portfolio Data Format](#portfolio-data-format)
+3. [Adding Icons with Iconify](#adding-icons-with-iconify)
+4. [Technologies Used](#technologies-used)
+5. [Figma Design](#figma-design)
+6. [Author and License](#author-and-license)
+7. [Bugs and Issues](#bugs-and-issues)
+8. [Homepage](#homepage)
 
-## 🚀 Быстрый старт
+## Usage
 
-### Установка зависимостей
+To add new elements to your portfolio, you need to add them in `/src/data/portfolioData.js`.
 
-```bash
-npm install
+## Portfolio Data Format
+
+The data for your portfolio should follow this format:
+
+```js
+/**
+ * @typedef PortfolioData
+ * @property {string} imgSrc - URL of the image
+ * @property {string} title - Title of the card
+ * @property {string[]} skills - Array of your skills, e.g., ['React', 'CSS', 'JavaScript']
+ * @property {string} description - Description of the card
+ * @property {string} demoURL - URL of a demo page
+ * @property {string} repoURL - URL of the repository, e.g., https://github.com/user/repo
+ * @property {string} anim - Animation that will play when the card loads, e.g., fade-up, fade-right, fade-left, fade-down
+ * @property {number} averageBrightness - Brightness level of the card's background color, e.g., 0.1
+ */
+
+/**
+ * @type {PortfolioData[]}
+ */
+export const portfolioData = [
+    {
+        imgSrc: 'https://dt2sdf0db8zob.cloudfront.net/wp-content/uploads/2021/06/copy-of-the-6-best-restaurant-website-templates-1.png',
+        title: 'Restaurant',
+        skills: ['React', 'StyledComponents'],
+        description: 'Laboris ex laboris mollit esse fugiat aute cillum nostrud enim dolor sit. Reprehenderit et non nulla irure aute nostrud commodo aute.',
+        demoURL: '',
+        repoURL: '',
+        anim: 'fade-right',
+    },
+    {
+        imgSrc: 'https://fiverr-res.cloudinary.com/images/q_auto,f_auto/gigs/299377097/original/7eb7dcebe244fcf5ad75d92b0969fc116946bd57/create-professional-amd-responsive-wordpress-website.jpg',
+        title: 'E-commerce',
+        skills: ['JavaScript', 'Bootstrap'],
+        description: 'Laboris ex laboris mollit esse fugiat aute cillum nostrud enim dolor sit. Reprehenderit et non nulla irure aute nostrud commodo aute.',
+        demoURL: '',
+        repoURL: '',
+        anim: 'fade-up',
+        averageBrightness: 0.1,
+    },
+    // Add more portfolio items here
+];
+
+const skillIcons = {
+    JavaScript: 'skill-icons:javascript',
+    React: 'skill-icons:react-dark',
+    Astro: 'skill-icons:astro',
+    CSS: 'skill-icons:css',
+    Sass: 'skill-icons:sass',
+    StyledComponents: 'skill-icons:styledcomponents',
+    Bootstrap: 'skill-icons:bootstrap',
+    Tailwind: 'skill-icons:tailwindcss-dark',
+};
+
+/**
+ * @description Maps portfolioData to include skill icons
+ */
+export const getPortfolioData = portfolioData.map((item) => ({
+    ...item,
+    skills: item.skills.map((skill) => skillIcons[skill]),
+}));
 ```
 
-### Запуск в режиме разработки
 
-```bash
-npm run dev
+> [!NOTE]
+> For skills Icons you may use Garrux library [https://github.com/Garruxx/ascii-icons](https://github.com/Garruxx/ascii-icons)
+
+This data is then passed to the portfolio component as props.
+
+## Adding Icons with Iconify
+
+We use Iconify for icons. To add new icons, use the `icon` attribute.
+
+### Example
+
+To use a React icon:
+
+```html
+<iconify-icon icon="logos:react" width="27" height="27"></iconify-icon>
 ```
 
-Сайт будет доступен по адресу `http://localhost:4321`
+In `data.js`, specify the icon identifier like this:
 
-### Сборка для продакшена
-
-```bash
-npm run build
+```js
+{
+    title: "React",
+    link: "https://reactjs.org/",
+    icon: "logos:react"
+}
 ```
 
-Собранные файлы будут в папке `dist/`
+### Adding the Iconify Script
 
-### Предпросмотр продакшен сборки
+Add the Iconify script to the `<head>` section of your project:
 
-```bash
-npm run preview
+```html
+<head>
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+</head>
 ```
 
-## 📁 Структура проекта
+Once this script is included, you can use any Iconify icon by specifying its identifier.
 
-```
-├── src/
-│   ├── components/     # Компоненты Astro
-│   ├── layouts/        # Макеты страниц
-│   ├── pages/          # Страницы сайта
-│   ├── styles/         # Глобальные стили
-│   ├── i18n/           # Переводы и интернационализация
-│   └── utils/          # Утилиты
-├── public/             # Статические файлы
-└── dist/              # Собранные файлы (генерируется)
-```
+## Technologies Used
 
-## 🌐 Деплой
+This template leverages several modern technologies to create a highly responsive and visually appealing portfolio:
 
-Проект готов к деплою на различные платформы:
+- **Astro**: A modern static site builder that allows you to use your favorite frameworks such as React, Vue, and Svelte. It optimizes for performance by shipping less JavaScript.
+- **React**: A JavaScript library for building user interfaces, which allows for the creation of reusable components.
+- **Tailwind CSS**: A utility-first CSS framework that enables you to design directly in your markup, providing flexibility and control over your styling.
+- **Styled Components**: A library for React and React Native that allows you to use component-level styles in your application. It utilizes tagged template literals to style components.
+- **Iconify**: A comprehensive library for icons that provides access to thousands of icons from different collections, all accessible via a single syntax.
 
-- **Cloudflare Pages** - рекомендуется (см. `QUICK_DEPLOY.md`)
-- **Vercel** - автоматический деплой из Git
-- **Netlify** - простой drag & drop деплой
-- **GitHub Pages** - через GitHub Actions
+## Figma Design
 
-Подробные инструкции в файле `QUICK_DEPLOY.md`
+You can view and edit the design of this template on Figma. Here is the [Figma design link](https://www.figma.com/design/15EteAKw8d0QCNCucw5lft/mi-primer-blog?node-id=200-643&t=hbUqn1hqSfLcfI92-0).
 
-## 🛠 Технологии
+## Author and License
 
-- [Astro](https://astro.build/) - фреймворк для статических сайтов
-- [Three.js](https://threejs.org/) - 3D графика
-- [GSAP](https://greensock.com/gsap/) - анимации
-- [Lenis](https://lenis.studiofreight.com/) - плавный скролл
-- [TypeScript](https://www.typescriptlang.org/) - типизация
+- **Author**: SofiDev / Garrux
+- **License**: MIT
 
-## 📝 Настройка
+## Bugs and Issues
 
-### Изменение контента
+If you encounter any bugs or have issues, please report them [here](https://github.com/SofiDevO/portfolio-astrosofidev-garrux/issues).
 
-- `src/pages/[lang]/index.astro` - главная страница
-- `src/i18n/ui.ts` - все тексты и переводы
-- `src/components/` - компоненты страницы
+## Homepage
 
-### Изменение стилей
-
-- `src/styles/global.css` - глобальные стили и переменные
-- Компоненты имеют свои стили в `<style>` блоках
-
-## 📄 Лицензия
-
-Этот проект может использоваться для некоммерческих целей.
-
-## 👤 Автор
-
-Danny - Personal Portfolio
+For more information and detailed documentation, visit the [homepage](https://github.com/SofiDevO/portfolio-astrosofidev-garrux#readme).
 
 ---
 
-**Примечание:** Для деплоя на GitHub см. файл `QUICK_DEPLOY.md`
+Enjoy building your portfolio! If you have any questions or run into any issues, feel free to reach out.

@@ -1,0 +1,38 @@
+---
+import './header.css';
+const { origin } = Astro.props;
+import Logo from '../Logo.astro';
+---
+
+<header class="header">
+	<div class="header__container">
+		<Logo name="Danny"/>
+		<nav class="links"   tabindex="0.1">
+			<button class="menu__btn">Menú</button>
+			<ul class="header__list">
+				{
+					origin.map((data) => (
+						<li>
+							<a class="menu__link" href={data.link}>
+								<span class="icon__container" data-i18n-key={data.key}>
+									<iconify-icon
+										class="icons"
+										icon={data.icon}
+										width="20"
+										height="20"
+									/>
+									{data.content}
+								</span>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+		<div class="lang-switch">
+			<button type="button" class="lang-btn" data-lang-btn="ru">RU</button>
+			<button type="button" class="lang-btn" data-lang-btn="en">EN</button>
+			<button type="button" class="lang-btn" data-lang-btn="tk">TK</button>
+		</div>
+	</div>
+</header>

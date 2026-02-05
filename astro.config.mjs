@@ -1,38 +1,13 @@
-// @ts-check
-import {
-  defineConfig,
-  fontProviders,
-} from "astro/config";
+import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
+import tailwind from '@astrojs/tailwind';
 
+import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
-  scopedStyleStrategy: 'where',
-  // Оптимизация сборки
-  build: {
-    inlineStylesheets: 'auto', // Автоматическая инлайнизация маленьких стилей
+  devToolbar: {
+    enabled: false
   },
-  // Оптимизация изображений
-  image: {
-    domains: [],
-    remotePatterns: [],
-  },
-  experimental: {
-    fonts: [
-      {
-        provider: fontProviders.google(),
-        name: "Roboto Slab",
-        cssVariable: "--font-roboto-slab",
-        weights: ["100 900"],
-        display: "swap", // Оптимизация загрузки шрифтов
-      },
-      {
-        provider: fontProviders.google(),
-        name: "Inter",
-        cssVariable: "--font-inter",
-        weights: ["100 900"],
-        display: "swap", // Оптимизация загрузки шрифтов
-      },
-    ],
-  },
+  integrations: [react(), tailwind(), sitemap()]
 });
